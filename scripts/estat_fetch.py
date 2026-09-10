@@ -85,7 +85,8 @@ class EstatClient:
             root = next(iter(data.values()))
             result = root.get("RESULT", {})
             status = int(result.get("STATUS", 0))
-            if status != 0:
+            # STATUS=1 は「正常終了だが該当データなし」。呼び出し側で空として扱う
+            if status not in (0, 1):
                 msg = result.get("ERROR_MSG", "不明なエラー")
                 if status == 100:  # 認証失敗はappIdの問題なので続行しない
                     raise SystemExit(f"認証に失敗しました: {msg}\n"
@@ -146,17 +147,31 @@ def search_tables(client: EstatClient, keyword: str, stats_code: str | None = No
         cache_key=None,
     )
     tables = as_list(data["GET_STATS_LIST"].get("DATALIST_INF", {}).get("TABLE_INF"))
+    if not tables:
+        return []
     rows = []
     for t in tables:
+        title = t.get("TITLE")
         rows.append({
             "table_id": t.get("@id"),
             "stat_name": (t.get("STAT_NAME") or {}).get("$", ""),
-            "title": (t.get("TITLE") or {}).get("$", "") if isinstance(t.get("TITLE"), dict) else t.get("TITLE", ""),
+            # 「都道府県データ 基礎データ」などの区分。地域粒度の判別に使う
+            "statistics_name": t.get("STATISTICS_NAME", ""),
+            "title": title.get("$", "") if isinstance(title, dict) else (title or ""),
+            "collect_area": t.get("COLLECT_AREA", ""),
+            "cycle": t.get("CYCLE", ""),
             "survey_date": t.get("SURVEY_DATE", ""),
             "updated": t.get("UPDATED_DATE", ""),
             "total": t.get("OVERALL_TOTAL_NUMBER", ""),
         })
-    return rows
+    # 同一IDが複数返ることがあるため重複を除く
+    seen, uniq = set(), []
+    for r in rows:
+        if r["table_id"] in seen:
+            continue
+        seen.add(r["table_id"])
+        uniq.append(r)
+    return uniq
 
 
 def get_meta(client: EstatClient, table_id: str) -> list[dict]:
@@ -197,13 +212,16 @@ def resolve_table(client: EstatClient, key: str, spec: dict, resolved: dict) -> 
     best = rows[0]
     if prefer:
         for row in rows:
-            text = f"{row['stat_name']} {row['title']}"
+            text = f"{row['stat_name']} {row['statistics_name']} {row['title']} {row['collect_area']}"
             if all(r.search(text) for r in prefer):
                 best = row
                 break
-    print(f"[{key}] 統計表を自動選定: {best['table_id']} / {best['stat_name']} / {best['title']}")
+    print(f"[{key}] 統計表を自動選定: {best['table_id']} / "
+          f"{best['statistics_name']} / {best['title']}")
     resolved[key] = {"table_id": best["table_id"], "stat_name": best["stat_name"],
-                     "title": best["title"], "candidates": rows[:10]}
+                     "statistics_name": best["statistics_name"],
+                     "title": best["title"], "collect_area": best["collect_area"],
+                     "candidates": rows[:10]}
     return best["table_id"]
 
 
@@ -328,9 +346,12 @@ def save_resolved(resolved: dict) -> None:
 
 def cmd_search(client: EstatClient, args) -> None:
     rows = search_tables(client, args.keyword, args.stats_code, args.limit)
+    if not rows:
+        print("該当する統計表がありませんでした。キーワードを変えてお試しください。")
+        return
     for r in rows:
-        print(f"{r['table_id']}  {r['total']:>10}件  {r['stat_name']} / {r['title']}"
-              f"  ({r['survey_date']})")
+        print(f"{r['table_id']}  {str(r['total']):>10}件  {r['statistics_name']} / "
+              f"{r['title']}  [地域:{r['collect_area']} / {r['cycle']}]")
     print(f"\n{len(rows)} 件表示しました。")
 
 
@@ -352,8 +373,15 @@ def fetch_source(client: EstatClient, key: str, label: str, source: dict,
     slug = f"{key}_{name}"
     print(f"\n### {slug}: {label}")
     table_id = resolve_table(client, slug, source, resolved)
-    levels = args.area_level.split(",") if args.area_level else source.get(
-        "area_levels", ["national", "pref"])
+    declared = source.get("area_levels", ["national", "pref"])
+    if args.area_level:
+        # 表に無い地域区分を指定しても空振りするだけなので、重なる部分だけ使う
+        levels = [lv for lv in args.area_level.split(",") if lv in declared]
+        if not levels:
+            print(f"  この表は {declared} のみのため飛ばします。")
+            return None
+    else:
+        levels = declared
 
     cat_filter = None
     if source.get("item_patterns"):
@@ -385,7 +413,13 @@ def fetch_source(client: EstatClient, key: str, label: str, source: dict,
 
 def fetch_indicator(client: EstatClient, key: str, spec: dict, resolved: dict,
                     args) -> None:
-    sources = spec.get("sources") or [spec]
+    sources = spec.get("sources")
+    if sources is None:
+        sources = [spec]
+    if not sources:
+        print(f"\n### {key}: {spec['label']} — 取得元の設定がないため飛ばします。"
+              f"\n    {spec.get('note', '')}")
+        return
     for source in sources:
         if args.area_level is None and source.get("enabled") is False:
             continue
@@ -453,7 +487,7 @@ def main() -> None:
         p = sub.add_parser(name, help=help_text)
         p.add_argument("--indicator", help="カンマ区切りの指標キー（未指定なら有効な全指標）")
         p.add_argument("--area-level", help="national,pref,city のカンマ区切りで上書き")
-        p.add_argument("--from-year", type=int, default=1980)
+        p.add_argument("--from-year", type=int, default=1975)
         p.set_defaults(func=cmd_fetch)
 
     p = sub.add_parser("build", help="指標CSVを1本にまとめる")

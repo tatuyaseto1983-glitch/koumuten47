@@ -5,3 +5,14 @@ config/resolved_tables.json
 __pycache__/
 *.pyc
 .env
+# 社人研からダウンロードしたExcel（スクリプトで再取得できる）
+data/ipss/
+
+# 指標ごとの明細CSV（合計70MB超。スクリプトで再生成できるため共有しない）
+data/processed/population_*.csv
+data/processed/households_*.csv
+data/processed/age_structure_*.csv
+data/processed/migration_*.csv
+data/processed/consumption_*.csv
+data/processed/future_population_*.csv
+data/processed/all_indicators.csv
