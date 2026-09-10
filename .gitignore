@@ -16,3 +16,6 @@ data/processed/migration_*.csv
 data/processed/consumption_*.csv
 data/processed/future_population_*.csv
 data/processed/all_indicators.csv
+
+# レポートに埋め込むデータ（テンプレートとスクリプトから再生成できる）
+data/processed/report_data.json
