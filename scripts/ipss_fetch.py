@@ -35,8 +35,8 @@ FILES = [
 ]
 
 FIELDS = ["indicator", "indicator_label", "area_code", "area_name", "area_level",
-          "pref_code", "pref_name", "time_code", "year", "cat_code", "cat_name",
-          "unit", "value", "value_raw"]
+          "pref_code", "pref_name", "time_code", "time_name", "year", "cat_code",
+          "cat_name", "unit", "value", "value_raw"]
 
 
 def download(files: list[str], sleep: float = 2.0) -> None:
@@ -122,6 +122,7 @@ def parse_file(path: Path) -> tuple[str, list[dict]]:
                 "pref_code": area_code[:2],
                 "pref_name": pref_name,
                 "time_code": f"{year}000000",
+                "time_name": f"{year}年",
                 "year": year,
                 "cat_code": path.stem,
                 "cat_name": label,

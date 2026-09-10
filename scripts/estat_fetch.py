@@ -303,6 +303,7 @@ def tidy_rows(key: str, label: str, values: list[dict], class_obj: list[dict],
             "pref_code": pref_code_of(area),
             "pref_name": pref_names.get(pref_code_of(area), ""),
             "time_code": v.get("@time", ""),
+            "time_name": names.get("time", {}).get(str(v.get("@time", "")), ""),
             "year": year,
             "cat_code": cat_code,
             "cat_name": cat_name,
@@ -313,8 +314,8 @@ def tidy_rows(key: str, label: str, values: list[dict], class_obj: list[dict],
 
 
 FIELDS = ["indicator", "indicator_label", "area_code", "area_name", "area_level",
-          "pref_code", "pref_name", "time_code", "year", "cat_code", "cat_name",
-          "unit", "value", "value_raw"]
+          "pref_code", "pref_name", "time_code", "time_name", "year", "cat_code",
+          "cat_name", "unit", "value", "value_raw"]
 
 
 def write_csv(path: Path, rows: list[dict]) -> None:
