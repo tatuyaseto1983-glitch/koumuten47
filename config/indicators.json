@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "scope": "全国（全国計・47都道府県・約1,900市区町村）",
+    "note": "統計表IDは改廃されるため、table_id を空にしておくと keyword で自動検索し config/resolved_tables.json に確定結果を残します。意図した表かどうかは resolved_tables.json の candidates で確認してください。",
+    "area_levels": {
+      "national": "全国計（地域コード 00000）",
+      "pref": "都道府県（下3桁が000）",
+      "city": "市区町村・政令市の区"
+    }
+  },
+  "indicators": {
+    "population": {
+      "label": "総人口",
+      "enabled": true,
+      "note": "5年ごとの国勢調査ベース。長期推移の土台になる指標です。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref"],
+          "table_search": {
+            "keyword": "社会・人口統計体系 都道府県データ 基礎データ",
+            "title_prefer": ["都道府県", "基礎データ"]
+          },
+          "item_patterns": ["総人口$", "^A1101", "総人口（"]
+        },
+        {
+          "name": "city",
+          "area_levels": ["city"],
+          "table_search": {
+            "keyword": "社会・人口統計体系 市区町村データ 基礎データ",
+            "title_prefer": ["市区町村", "基礎データ"]
+          },
+          "item_patterns": ["総人口$", "^A1101", "総人口（"]
+        }
+      ]
+    },
+    "households": {
+      "label": "世帯数・平均世帯人員",
+      "enabled": true,
+      "note": "住宅需要は人口より世帯数と連動します。1世帯あたり人数の縮小も併せて見ます。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref"],
+          "table_search": {
+            "keyword": "社会・人口統計体系 都道府県データ 基礎データ",
+            "title_prefer": ["都道府県", "基礎データ"]
+          },
+          "item_patterns": ["一般世帯数", "世帯数$", "1世帯当", "一世帯当"]
+        },
+        {
+          "name": "city",
+          "area_levels": ["city"],
+          "table_search": {
+            "keyword": "社会・人口統計体系 市区町村データ 基礎データ",
+            "title_prefer": ["市区町村", "基礎データ"]
+          },
+          "item_patterns": ["一般世帯数", "世帯数$", "1世帯当", "一世帯当"]
+        }
+      ]
+    },
+    "age_structure": {
+      "label": "年齢3区分別人口・高齢化率",
+      "enabled": true,
+      "note": "年少（15歳未満）・生産年齢（15〜64歳）・老年（65歳以上）。高齢化率は集計時に算出します。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref"],
+          "table_search": {
+            "keyword": "社会・人口統計体系 都道府県データ 基礎データ",
+            "title_prefer": ["都道府県", "基礎データ"]
+          },
+          "item_patterns": ["15歳未満人口", "15〜64歳人口", "15~64歳人口", "65歳以上人口", "年齢3区分"]
+        },
+        {
+          "name": "city",
+          "area_levels": ["city"],
+          "table_search": {
+            "keyword": "社会・人口統計体系 市区町村データ 基礎データ",
+            "title_prefer": ["市区町村", "基礎データ"]
+          },
+          "item_patterns": ["15歳未満人口", "15〜64歳人口", "15~64歳人口", "65歳以上人口", "年齢3区分"]
+        }
+      ]
+    },
+    "migration": {
+      "label": "転入者数・転出者数（社会増減）",
+      "enabled": true,
+      "note": "自然増減と分けて見ることで、住宅需要が「人の移動」で動いているのか判断できます。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref"],
+          "table_search": {
+            "keyword": "住民基本台帳人口移動報告 都道府県",
+            "title_prefer": ["移動"]
+          },
+          "item_patterns": ["転入者数", "転出者数", "転入超過"]
+        }
+      ]
+    },
+    "future_population": {
+      "label": "将来推計人口（2050年まで）",
+      "enabled": true,
+      "note": "社人研「日本の地域別将来推計人口」。e-Statに収載がない場合は社人研サイトのCSVを別途取り込みます。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref"],
+          "table_search": {
+            "keyword": "将来推計人口 都道府県",
+            "title_prefer": ["将来推計"]
+          },
+          "item_patterns": ["総数", "総人口"]
+        }
+      ]
+    },
+    "consumption": {
+      "label": "1世帯当たり消費支出（生活消費額）",
+      "enabled": true,
+      "note": "家計調査は都道府県庁所在市単位が基本です。市区町村別の公表はありません。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref", "city"],
+          "table_search": {
+            "keyword": "家計調査 都道府県 消費支出 二人以上の世帯",
+            "title_prefer": ["家計"]
+          },
+          "item_patterns": ["消費支出", "住居", "設備修繕・維持"]
+        }
+      ]
+    },
+    "housing_stock": {
+      "label": "住宅ストック・空き家（住宅・土地統計調査）",
+      "enabled": false,
+      "note": "任意追加。総住宅数・空き家数・持ち家数など。リフォームや民泊の物件供給量を見るときに使います。既定では取得しません。",
+      "sources": [
+        {
+          "name": "pref",
+          "area_levels": ["national", "pref"],
+          "table_search": {
+            "keyword": "住宅・土地統計調査 住宅数 空き家 都道府県",
+            "title_prefer": ["住宅"]
+          },
+          "item_patterns": ["総住宅数", "空き家", "持ち家", "居住世帯"]
+        }
+      ]
+    }
+  }
+}

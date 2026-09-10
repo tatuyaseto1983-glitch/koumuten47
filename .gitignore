@@ -1,0 +1,7 @@
+# 取得した生JSONは容量が大きいので共有しない
+data/raw/
+# 自動選定した統計表IDの控え（環境ごとに再生成できる）
+config/resolved_tables.json
+__pycache__/
+*.pyc
+.env
