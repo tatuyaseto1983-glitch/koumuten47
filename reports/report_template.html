@@ -1,175 +1,193 @@
-<title>全国住宅市場コンパス</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho+B1:wght@600&display=swap">
+<title>住宅市場コンパス</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <style>
   :root {
     color-scheme: light;
-    --plane: #f1f5f4;
-    --surface: #fcfdfc;
-    --surface-sunk: #eef3f2;
-    --ink: #132321;
-    --ink-2: #4c5c5a;
-    --ink-muted: #7c8b89;
-    --hairline: #dce4e2;
-    --rule: #c6d3d0;
-    --brand-teal: #2ea89e;
-    --brand-amber: #e0a45c;
-    --brand-teal-ink: #1c6f69;
+    --plane: #eef3f2;
+    --surface: #ffffff;
+    --surface-sunk: #f2f6f5;
+    --ink: #13211f;
+    --ink-2: #4d5c5a;
+    --ink-muted: #7d8c8a;
+    --hairline: #dde5e3;
+    --rule: #c7d3d1;
+    --brand: #2ea89e;
+    --brand-ink: #1c6f69;
+    --amber: #e0a45c;
     --s1: #009c8d;
     --s2: #c8823a;
     --s3: #2f62c4;
-    --s4: #b5566a;
     --ord-1: #6fc2b9;
     --ord-2: #219a8d;
     --ord-3: #0e5b54;
     --ord-3-ink: #ffffff;
-    --grid: #e4ebe9;
-    --axis: #c6d3d0;
+    --grid: #e6edeb;
+    --axis: #c7d3d1;
     --wash-good: rgba(0, 156, 141, .07);
     --wash-warn: rgba(200, 130, 58, .07);
-    --shadow: 0 1px 2px rgba(19, 35, 33, .05), 0 8px 24px rgba(19, 35, 33, .05);
+    --shadow: 0 1px 2px rgba(19, 33, 31, .05), 0 6px 20px rgba(19, 33, 31, .05);
     --sans: "Noto Sans JP", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --mincho: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
     --data: "IBM Plex Sans", "Noto Sans JP", system-ui, sans-serif;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --plane: #0e1615;
+      --plane: #0d1514;
       --surface: #16201f;
-      --surface-sunk: #1b2624;
+      --surface-sunk: #1c2725;
       --ink: #edf3f1;
       --ink-2: #aebebb;
-      --ink-muted: #7f8e8c;
+      --ink-muted: #808f8d;
       --hairline: #26312f;
-      --rule: #33413e;
-      --brand-teal: #3fbfb4;
-      --brand-amber: #e8b478;
-      --brand-teal-ink: #6fcfc5;
+      --rule: #34423f;
+      --brand: #3fbfb4;
+      --brand-ink: #6fcfc5;
+      --amber: #e8b478;
       --s1: #22a697;
       --s2: #b8813f;
       --s3: #5a87d8;
-      --s4: #c9647a;
       --ord-1: #1d6f66;
       --ord-2: #28a294;
       --ord-3: #84d2c8;
       --ord-3-ink: #0c1a19;
       --grid: #232e2c;
-      --axis: #33413e;
+      --axis: #34423f;
       --wash-good: rgba(34, 166, 151, .10);
       --wash-warn: rgba(184, 129, 63, .10);
-      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
     }
   }
 
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --plane: #0e1615;
+    --plane: #0d1514;
     --surface: #16201f;
-    --surface-sunk: #1b2624;
+    --surface-sunk: #1c2725;
     --ink: #edf3f1;
     --ink-2: #aebebb;
-    --ink-muted: #7f8e8c;
+    --ink-muted: #808f8d;
     --hairline: #26312f;
-    --rule: #33413e;
-    --brand-teal: #3fbfb4;
-    --brand-amber: #e8b478;
-    --brand-teal-ink: #6fcfc5;
+    --rule: #34423f;
+    --brand: #3fbfb4;
+    --brand-ink: #6fcfc5;
+    --amber: #e8b478;
     --s1: #22a697;
     --s2: #b8813f;
     --s3: #5a87d8;
-    --s4: #c9647a;
     --ord-1: #1d6f66;
     --ord-2: #28a294;
     --ord-3: #84d2c8;
     --ord-3-ink: #0c1a19;
     --grid: #232e2c;
-    --axis: #33413e;
+    --axis: #34423f;
     --wash-good: rgba(34, 166, 151, .10);
     --wash-warn: rgba(184, 129, 63, .10);
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
   }
 
   body { background: var(--plane); color: var(--ink); font-family: var(--sans);
-         font-size: 15px; line-height: 1.8; }
+         font-size: 15px; line-height: 1.75; }
 
-  .page { max-width: 1180px; margin: 0 auto; padding-inline: 20px;
-          padding-block: 32px 72px; display: flex; flex-direction: column; gap: 40px; }
+  /* ---------- 上部の固定バー ---------- */
+  .topbar { position: sticky; top: 0; z-index: 20; background: var(--surface);
+    border-bottom: 1px solid var(--hairline); }
 
-  /* --- ヘッダ --- */
-  .masthead { display: flex; flex-direction: column; gap: 12px; }
+  .topbar .inner { max-width: 1200px; margin: 0 auto; padding-inline: 20px;
+    padding-block: 12px 0; display: flex; flex-direction: column; gap: 11px; }
 
-  .eyebrow { font-family: var(--data); font-size: 11.5px; font-weight: 600;
-             letter-spacing: .16em; text-transform: uppercase;
-             color: var(--brand-teal-ink); margin: 0; }
+  .brandrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
-  .masthead h1 { font-family: var(--mincho); font-weight: 600;
-                 font-size: clamp(28px, 4.6vw, 42px); line-height: 1.3;
-                 letter-spacing: .02em; margin: 0; text-wrap: balance; }
+  .mark { width: 30px; height: 30px; border-radius: 7px; flex: none; display: grid;
+    place-items: center; background: var(--brand); color: #fff; font-family: var(--data);
+    font-weight: 600; font-size: 15px; }
 
-  .masthead h1::after { content: ""; display: block; width: 64px; height: 3px;
-    margin-top: 16px;
-    background: linear-gradient(90deg, var(--brand-teal) 0 60%, var(--brand-amber) 60% 100%); }
+  .brandrow h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: .01em; }
 
-  .lede { margin: 0; max-width: 64ch; font-size: 16.5px; line-height: 1.9; color: var(--ink-2); }
+  .brandrow .meta { margin-left: auto; font-family: var(--data); font-size: 11.5px;
+    color: var(--ink-muted); text-align: right; line-height: 1.5; }
 
-  .stamp { font-family: var(--data); font-size: 12.5px; color: var(--ink-muted); margin: 0; }
+  .pickers { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 
-  nav.jump { display: flex; flex-wrap: wrap; gap: 8px; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
 
-  nav.jump a { font-family: var(--data); font-size: 12.5px; text-decoration: none;
-    color: var(--ink-2); background: var(--surface); border: 1px solid var(--hairline);
-    border-radius: 999px; padding: 5px 13px; }
+  .field label { font-family: var(--data); font-size: 11px; font-weight: 600;
+    letter-spacing: .07em; color: var(--ink-muted); text-transform: uppercase; }
 
-  nav.jump a:hover { border-color: var(--brand-teal); color: var(--brand-teal-ink); }
+  .field select { font-family: var(--sans); font-size: 14.5px; padding: 8px 12px;
+    border: 1px solid var(--rule); border-radius: 6px; background: var(--surface);
+    color: var(--ink); min-width: 190px; }
 
-  /* --- セクション --- */
-  section { display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 16px; }
+  .field select:disabled { color: var(--ink-muted); background: var(--surface-sunk); }
 
-  .sec-head { display: flex; flex-direction: column; gap: 7px; }
+  .crumb { display: flex; align-items: center; gap: 7px; font-family: var(--data);
+    font-size: 13px; color: var(--ink-2); padding-bottom: 9px; flex-wrap: wrap; }
 
-  .sec-head h2 { font-family: var(--mincho); font-weight: 600;
-    font-size: clamp(20px, 3vw, 26px); line-height: 1.45; margin: 0;
-    padding-top: 14px; border-top: 2px solid var(--rule); text-wrap: balance; }
+  .crumb b { color: var(--ink); font-weight: 600; }
 
-  .sec-head p { margin: 0; max-width: 68ch; color: var(--ink-2); }
+  .crumb .sep { color: var(--ink-muted); }
 
-  p { margin: 0; max-width: 68ch; }
+  button.ghost { font-family: var(--sans); font-size: 13px; padding: 8px 14px;
+    border: 1px solid var(--rule); border-radius: 6px; background: var(--surface);
+    color: var(--ink-2); cursor: pointer; align-self: flex-start; }
 
-  .note { font-size: 13px; color: var(--ink-muted); line-height: 1.75; max-width: 78ch; }
+  button.ghost:hover { border-color: var(--brand); color: var(--brand-ink); }
 
-  /* --- タイル --- */
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1px; background: var(--hairline); border: 1px solid var(--hairline);
-    border-radius: 3px; overflow: hidden; }
+  .tabs { display: flex; gap: 2px; overflow-x: auto; border-top: 1px solid var(--hairline);
+    margin-inline: -20px; padding-inline: 20px; }
 
-  .tile { background: var(--surface); padding: 18px 20px 20px;
-    display: flex; flex-direction: column; gap: 3px; }
+  .tabs button { font-family: var(--sans); font-size: 14px; font-weight: 500;
+    padding: 11px 15px; border: 0; border-bottom: 2px solid transparent; background: none;
+    color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+
+  .tabs button:hover { color: var(--ink); }
+
+  .tabs button[aria-selected="true"] { color: var(--brand-ink); font-weight: 700;
+    border-bottom-color: var(--brand); }
+
+  /* ---------- 本体 ---------- */
+  .page { max-width: 1200px; margin: 0 auto; padding-inline: 20px;
+    padding-block: 24px 64px; }
+
+  .panel { display: flex; flex-direction: column; gap: 22px; }
+
+  .headline { display: flex; flex-direction: column; gap: 6px; }
+
+  .headline h2 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: .01em; }
+
+  .headline p { margin: 0; max-width: 72ch; color: var(--ink-2); font-size: 14.5px; }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+    gap: 12px; }
+
+  .tile { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 15px 17px 16px; display: flex; flex-direction: column; gap: 2px;
+    box-shadow: var(--shadow); }
 
   .tile .label { font-family: var(--data); font-size: 11px; font-weight: 600;
-    letter-spacing: .09em; color: var(--ink-muted); text-transform: uppercase; }
+    letter-spacing: .07em; color: var(--ink-muted); text-transform: uppercase; }
 
-  .tile .value { font-family: var(--data); font-size: 27px; font-weight: 600;
-    line-height: 1.25; letter-spacing: -.01em; }
+  .tile .value { font-family: var(--data); font-size: 25px; font-weight: 600;
+    line-height: 1.3; letter-spacing: -.01em; }
 
-  .tile .value .unit { font-size: 14px; font-weight: 400; color: var(--ink-2); margin-left: 2px; }
+  .tile .value .unit { font-size: 13px; font-weight: 400; color: var(--ink-2); margin-left: 3px; }
 
-  .tile .delta { font-family: var(--data); font-size: 13px; font-weight: 600; }
+  .tile .delta { font-family: var(--data); font-size: 12.5px; font-weight: 600; }
 
-  .tile .sub { font-size: 12px; color: var(--ink-2); line-height: 1.65; }
+  .tile .sub { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
 
-  /* --- 図 --- */
   figure { margin: 0; background: var(--surface); border: 1px solid var(--hairline);
-    border-radius: 3px; box-shadow: var(--shadow); padding: 20px 20px 16px;
-    display: flex; flex-direction: column; gap: 12px; }
+    border-radius: 8px; box-shadow: var(--shadow); padding: 18px 18px 14px;
+    display: flex; flex-direction: column; gap: 11px; }
 
-  figcaption { display: flex; flex-direction: column; gap: 3px; }
+  figcaption { display: flex; flex-direction: column; gap: 2px; }
 
   figcaption .title { font-weight: 700; font-size: 15px; }
 
-  figcaption .sub { font-size: 12.5px; color: var(--ink-muted); font-family: var(--data); }
+  figcaption .sub { font-size: 12px; color: var(--ink-muted); font-family: var(--data);
+    line-height: 1.6; }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 7px 18px; font-family: var(--data);
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--data);
     font-size: 12.5px; color: var(--ink-2); }
 
   .legend span { display: inline-flex; align-items: center; gap: 7px; }
@@ -182,31 +200,23 @@
 
   .chart-wrap { position: relative; width: 100%; }
 
+  .chart-wrap .empty { font-size: 13px; color: var(--ink-muted); padding: 28px 0;
+    text-align: center; }
+
   svg { display: block; max-width: 100%; }
 
   svg text { font-family: var(--data); }
 
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 16px; }
 
-  .small-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: 3px;
-    overflow: hidden; }
+  .notice { background: var(--surface-sunk); border: 1px solid var(--hairline);
+    border-left: 3px solid var(--amber); border-radius: 6px; padding: 13px 16px;
+    font-size: 13.5px; color: var(--ink-2); line-height: 1.75; }
 
-  .small { background: var(--surface); padding: 14px 16px 12px;
-    display: flex; flex-direction: column; gap: 6px; }
-
-  .small .head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-
-  .small .nm { font-size: 13px; font-weight: 700; }
-
-  .small .dl { font-family: var(--data); font-size: 12.5px; font-weight: 600; }
-
-  .small .val { font-family: var(--data); font-size: 19px; font-weight: 600; line-height: 1.2; }
-
-  .small .val .unit { font-size: 12px; font-weight: 400; color: var(--ink-2); margin-left: 2px; }
+  .notice b { color: var(--ink); }
 
   .tip { position: absolute; pointer-events: none; background: var(--surface);
-    border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 3px;
+    border: 1px solid var(--rule); box-shadow: var(--shadow); border-radius: 6px;
     padding: 8px 11px; font-family: var(--data); font-size: 12.5px; line-height: 1.6;
     color: var(--ink); white-space: nowrap; z-index: 5; }
 
@@ -214,27 +224,19 @@
 
   .tip .tip-t { font-weight: 600; margin-bottom: 3px; }
 
-  .tip .row { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+  .tip .row { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
 
   .tip .row i { width: 9px; height: 9px; border-radius: 2px; flex: none; }
 
   .tip .row b { font-weight: 600; font-variant-numeric: tabular-nums; }
 
-  /* --- 表 --- */
-  .table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--hairline);
-    border-radius: 3px; box-shadow: var(--shadow); }
-
-  .table-wrap.tall { max-height: 620px; overflow-y: auto; }
+  /* ---------- 表 ---------- */
+  .table-wrap { overflow: auto; background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 8px; box-shadow: var(--shadow); max-height: 560px; }
 
   table { border-collapse: collapse; width: 100%; font-family: var(--data); font-size: 12.5px; }
 
-  caption { text-align: left; padding: 16px 18px 4px; font-family: var(--sans);
-    font-weight: 700; font-size: 15px; color: var(--ink); }
-
-  caption .cap-sub { display: block; font-weight: 400; font-size: 12.5px;
-    color: var(--ink-muted); font-family: var(--data); margin-top: 2px; }
-
-  th, td { padding: 8px 13px; text-align: right; white-space: nowrap;
+  th, td { padding: 9px 13px; text-align: right; white-space: nowrap;
     font-variant-numeric: tabular-nums; }
 
   th.txt, td.txt { text-align: left; font-variant-numeric: normal; }
@@ -247,349 +249,119 @@
 
   thead th.sortable:hover { color: var(--ink); }
 
-  thead th .arrow { opacity: .35; margin-left: 3px; }
+  thead th .arrow { opacity: .3; margin-left: 3px; }
 
-  thead th[aria-sort] .arrow { opacity: 1; color: var(--brand-teal-ink); }
+  thead th[aria-sort] .arrow { opacity: 1; color: var(--brand-ink); }
 
-  tbody tr { border-bottom: 1px solid var(--hairline); }
+  tbody tr { border-bottom: 1px solid var(--hairline); cursor: pointer; }
 
   tbody tr:last-child { border-bottom: 0; }
 
   tbody tr:hover { background: var(--surface-sunk); }
 
+  tbody tr.current { background: var(--wash-good); }
+
   td.name { font-family: var(--sans); font-weight: 500; }
 
-  td.sub { color: var(--ink-muted); font-family: var(--sans); }
-
-  .down { color: var(--s2); }
+  td.muted { color: var(--ink-muted); font-family: var(--sans); }
 
   .up { color: var(--s1); }
 
-  .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 8px;
-    border-radius: 999px; border: 1px solid currentColor; }
+  .down { color: var(--s2); }
+
+  .pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 9px;
+    border-radius: 999px; border: 1px solid currentColor; font-family: var(--data); }
 
   .pill.q1 { color: var(--s1); }
   .pill.q2 { color: var(--s2); }
-  .pill.q3 { color: var(--ink-muted); }
-  .pill.q4 { color: var(--ink-muted); }
+  .pill.q3, .pill.q4 { color: var(--ink-muted); }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
 
-  .controls input[type="search"] { font-family: var(--sans); font-size: 13.5px;
-    padding: 7px 12px; border: 1px solid var(--rule); border-radius: 3px;
-    background: var(--surface); color: var(--ink); min-width: 200px; }
+  .controls .count { font-family: var(--data); font-size: 12.5px; color: var(--ink-muted);
+    padding-bottom: 9px; }
 
-  .controls .count { font-family: var(--data); font-size: 12.5px; color: var(--ink-muted); }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px;
+    overflow: hidden; align-self: flex-end; }
 
-  button.more { font-family: var(--sans); font-size: 13.5px; padding: 8px 18px;
-    border: 1px solid var(--rule); border-radius: 3px; background: var(--surface);
-    color: var(--ink); cursor: pointer; align-self: flex-start; }
+  .seg button { font-family: var(--sans); font-size: 13.5px; padding: 8px 16px; border: 0;
+    background: var(--surface); color: var(--ink-2); cursor: pointer; }
 
-  button.more:hover { border-color: var(--brand-teal); color: var(--brand-teal-ink); }
+  .seg button + button { border-left: 1px solid var(--rule); }
 
-  /* --- 出典 --- */
+  .seg button[aria-pressed="true"] { background: var(--brand); color: #fff; font-weight: 600; }
+
+  /* ---------- 出典 ---------- */
   .sources { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); }
+    gap: 12px; }
 
-  .source { background: var(--surface); padding: 15px 17px; display: flex;
-    flex-direction: column; gap: 3px; }
+  .source { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
 
   .source .k { font-family: var(--data); font-size: 11px; font-weight: 600;
-    letter-spacing: .07em; color: var(--brand-teal-ink); text-transform: uppercase; }
+    letter-spacing: .06em; color: var(--brand-ink); text-transform: uppercase; }
 
   .source .v { font-size: 13px; line-height: 1.7; }
 
   .source .v span { display: block; color: var(--ink-muted); font-size: 12px; }
 
   ul.caveats { margin: 0; padding-left: 1.15em; display: flex; flex-direction: column;
-    gap: 8px; max-width: 76ch; }
+    gap: 9px; max-width: 78ch; }
 
   ul.caveats li { line-height: 1.8; font-size: 14px; }
 
-  .method { background: var(--surface); border: 1px solid var(--hairline); border-radius: 3px;
-    padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .method { background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 9px; }
 
   .method .k { font-family: var(--data); font-size: 11px; font-weight: 600;
-    letter-spacing: .07em; color: var(--brand-teal-ink); text-transform: uppercase; }
+    letter-spacing: .06em; color: var(--brand-ink); text-transform: uppercase; }
 
   .method code { font-family: var(--data); font-size: 13px; background: var(--surface-sunk);
-    padding: 2px 7px; border-radius: 3px; }
+    padding: 4px 9px; border-radius: 4px; display: inline-block; }
 
-  .footer { border-top: 2px solid var(--rule); padding-top: 16px; color: var(--ink-muted);
-    font-size: 12.5px; font-family: var(--data); }
+  .method p { margin: 0; max-width: 74ch; font-size: 13.5px; color: var(--ink-2); }
 
-  a { color: var(--brand-teal-ink); }
+  .foot { color: var(--ink-muted); font-size: 12px; font-family: var(--data);
+    border-top: 1px solid var(--hairline); padding-top: 14px; }
 
-  :focus-visible { outline: 2px solid var(--brand-teal); outline-offset: 2px; }
+  a { color: var(--brand-ink); }
 
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
-  @media (max-width: 620px) {
-    .page { gap: 32px; padding-block: 24px 52px; }
-    .tile .value { font-size: 23px; }
-    body { font-size: 14.5px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  @media (max-width: 640px) {
+    .brandrow .meta { margin-left: 0; text-align: left; width: 100%; }
+    .field select { min-width: 150px; }
+    .tile .value { font-size: 22px; }
   }
 </style>
 
+<div class="topbar">
+  <div class="inner">
+    <div class="brandrow">
+      <span class="mark" aria-hidden="true">住</span>
+      <h1>住宅市場コンパス</h1>
+      <span class="meta" id="meta"></span>
+    </div>
+    <div class="pickers">
+      <div class="field">
+        <label for="sel-pref">都道府県</label>
+        <select id="sel-pref"></select>
+      </div>
+      <div class="field">
+        <label for="sel-city">市区町村</label>
+        <select id="sel-city"></select>
+      </div>
+      <button class="ghost" id="btn-reset" type="button">全国に戻す</button>
+    </div>
+    <div class="crumb" id="crumb"></div>
+    <div class="tabs" id="tabs" role="tablist"></div>
+  </div>
+</div>
+
 <div class="page">
-
-  <header class="masthead">
-    <p class="eyebrow">SUMUS コンサル事業部 ／ 住宅市場データ</p>
-    <h1>全国住宅市場コンパス</h1>
-    <p class="lede">
-      新設住宅着工、人口と世帯、家計調査、働く人の環境を、全国・47都道府県・
-      市区町村の3つの粒度でまとめた資料です。営業圏をどこに置くかの判断材料として使います。
-    </p>
-    <p class="stamp" id="stamp"></p>
-    <nav class="jump">
-      <a href="#starts">着工の動き</a>
-      <a href="#types">住宅種類別</a>
-      <a href="#demand">需要の土台</a>
-      <a href="#kakei">家計のすがた</a>
-      <a href="#work">働く人の環境</a>
-      <a href="#pref">都道府県ランキング</a>
-      <a href="#city">市区町村の見分け</a>
-      <a href="#notes">出典と注意</a>
-    </nav>
-  </header>
-
-  <section id="starts">
-    <div class="sec-head">
-      <h2>着工の動き：市場は20年で6割に縮んだ</h2>
-      <p id="starts-lede"></p>
-    </div>
-    <div class="tiles" id="starts-tiles"></div>
-    <figure>
-      <figcaption>
-        <span class="title">新設住宅着工戸数の月次推移（全国）</span>
-        <span class="sub" id="monthly-sub"></span>
-      </figcaption>
-      <div class="legend">
-        <span><i style="background:var(--s1)"></i>総戸数</span>
-        <span><i style="background:var(--s2)"></i>持家</span>
-      </div>
-      <div class="chart-wrap" id="chart-monthly"></div>
-    </figure>
-  </section>
-
-  <section id="types">
-    <div class="sec-head">
-      <h2>住宅種類別：持家と分譲マンションの落ち込みが大きい</h2>
-      <p>同じ「着工減」でも中身が違います。持家は3割台の減少ですが、分譲マンションは半分以下です。工務店の主戦場である持家が、市場全体より緩やかに減っている点は押さえておきたいところです。</p>
-    </div>
-    <div class="small-grid" id="type-small"></div>
-    <p class="note" id="type-note"></p>
-  </section>
-
-  <section id="demand">
-    <div class="sec-head">
-      <h2>需要の土台：人口より世帯数を見る</h2>
-      <p>住宅の必要数を決めるのは人数ではなく世帯数です。この40年、人口が横ばいでも世帯数は増え続けました。家族が小さく分かれた分、必要な家の数が増えたためです。冷蔵庫が1台で済む家族が2つに分かれれば冷蔵庫は2台いる——住宅も同じ理屈です。</p>
-    </div>
-    <div class="tiles" id="demand-tiles"></div>
-    <div class="grid-2">
-      <figure>
-        <figcaption>
-          <span class="title">人口と世帯数の推移（1980年＝100）</span>
-          <span class="sub">国勢調査／一般世帯数ベース</span>
-        </figcaption>
-        <div class="legend">
-          <span><i style="background:var(--s1)"></i>世帯数</span>
-          <span><i style="background:var(--s2)"></i>人口</span>
-        </div>
-        <div class="chart-wrap" id="chart-indexed"></div>
-      </figure>
-      <figure>
-        <figcaption>
-          <span class="title">総人口の推移と2050年までの推計</span>
-          <span class="sub">実績＝国勢調査・人口推計／推計＝社人研 令和5年推計</span>
-        </figcaption>
-        <div class="legend">
-          <span><i style="background:var(--s1)"></i>実績</span>
-          <span><i style="background:var(--s2);background-image:repeating-linear-gradient(90deg,var(--s2) 0 5px,transparent 5px 8px)"></i>推計</span>
-        </div>
-        <div class="chart-wrap" id="chart-population"></div>
-      </figure>
-    </div>
-    <figure>
-      <figcaption>
-        <span class="title">年齢3区分の構成比（1980〜2050年）</span>
-        <span class="sub">2020年までが実績、2030年以降が推計。新築の主な買い手である15〜64歳が細っていきます</span>
-      </figcaption>
-      <div class="legend">
-        <span><i class="sq" style="background:var(--ord-1)"></i>15歳未満</span>
-        <span><i class="sq" style="background:var(--ord-2)"></i>15〜64歳</span>
-        <span><i class="sq" style="background:var(--ord-3)"></i>65歳以上</span>
-      </div>
-      <div class="chart-wrap" id="chart-age"></div>
-    </figure>
-  </section>
-
-  <section id="kakei">
-    <div class="sec-head">
-      <h2>家計のすがた：住居費は家計の6％に満たない</h2>
-      <p id="kakei-lede"></p>
-    </div>
-    <div class="tiles" id="kakei-tiles"></div>
-    <div class="grid-2">
-      <figure>
-        <figcaption>
-          <span class="title">費目別の月額支出（全国・二人以上の世帯）</span>
-          <span class="sub" id="breakdown-sub"></span>
-        </figcaption>
-        <div class="chart-wrap" id="chart-breakdown"></div>
-      </figure>
-      <figure>
-        <figcaption>
-          <span class="title">消費支出と住居費の推移（全国）</span>
-          <span class="sub">家計調査／1世帯あたり月額。上下で目盛りが異なります</span>
-        </figcaption>
-        <div class="chart-wrap" id="chart-spend-trend"></div>
-      </figure>
-    </div>
-    <div class="table-wrap tall">
-      <table id="kakei-table">
-        <caption>都道府県別の家計
-          <span class="cap-sub" id="kakei-cap"></span>
-        </caption>
-      </table>
-    </div>
-  </section>
-
-  <section id="work">
-    <div class="sec-head">
-      <h2>働く人の環境：採用の条件は県によって2割違う</h2>
-      <p id="work-lede"></p>
-    </div>
-    <div class="tiles" id="work-tiles"></div>
-    <div class="table-wrap tall">
-      <table id="work-table">
-        <caption>都道府県別の給与と求人
-          <span class="cap-sub" id="work-cap"></span>
-        </caption>
-      </table>
-    </div>
-  </section>
-
-  <section id="pref">
-    <div class="sec-head">
-      <h2>都道府県ランキング：着工の前年比</h2>
-      <p id="pref-lede"></p>
-    </div>
-    <figure>
-      <figcaption>
-        <span class="title">新設住宅着工戸数の前年比（47都道府県）</span>
-        <span class="sub" id="pref-bar-sub"></span>
-      </figcaption>
-      <div class="chart-wrap" id="chart-pref"></div>
-    </figure>
-    <div class="table-wrap tall">
-      <table id="pref-table">
-        <caption>都道府県別の主要指標
-          <span class="cap-sub">見出しをクリックすると並べ替えできます。横にスクロールすると続きの列が見られます。</span>
-        </caption>
-      </table>
-    </div>
-  </section>
-
-  <section id="city">
-    <div class="sec-head">
-      <h2>市区町村の見分け：人は来ているのに家が建っていない場所</h2>
-      <p id="city-lede"></p>
-    </div>
-    <div class="method">
-      <span class="k">狙い目スコアの作り方</span>
-      <p><code>スコア ＝ 転入超過（世帯1,000あたり）− 着工戸数（世帯1,000あたり）</code></p>
-      <p class="note">人の流入に対して住宅の供給が追いついていないほど、スコアは大きくなります。公的な統計値ではなく、需要と供給の差を見るためにこちらで作った目安です。地震などの特殊事情がある年は、数値が極端に振れることがあります。</p>
-    </div>
-    <figure>
-      <figcaption>
-        <span class="title">需要と供給の4区分（市区町村）</span>
-        <span class="sub" id="scatter-sub"></span>
-      </figcaption>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--s1)"></i>狙い目スコア上位15</span>
-        <span><i class="dot" style="background:var(--ink-muted)"></i>その他の市区町村</span>
-      </div>
-      <div class="chart-wrap" id="chart-scatter"></div>
-    </figure>
-    <div class="grid-2">
-      <figure>
-        <figcaption>
-          <span class="title">狙い目スコア 上位15</span>
-          <span class="sub">世帯数1万以上の市区町村から</span>
-        </figcaption>
-        <div class="chart-wrap" id="chart-score-top"></div>
-      </figure>
-      <figure>
-        <figcaption>
-          <span class="title">狙い目スコア 下位15</span>
-          <span class="sub">供給が需要を大きく上回っている、または人口流出が大きい</span>
-        </figcaption>
-        <div class="chart-wrap" id="chart-score-bottom"></div>
-      </figure>
-    </div>
-    <div class="controls">
-      <input type="search" id="city-search" placeholder="市区町村名・都道府県名で絞り込む" aria-label="市区町村を絞り込む">
-      <span class="count" id="city-count"></span>
-    </div>
-    <div class="table-wrap tall">
-      <table id="city-table">
-        <caption>市区町村別の一覧
-          <span class="cap-sub" id="city-cap"></span>
-        </caption>
-      </table>
-    </div>
-    <button class="more" id="city-more" type="button">さらに50件表示</button>
-  </section>
-
-  <section id="notes">
-    <div class="sec-head">
-      <h2>出典と、読むときの注意</h2>
-      <p>数値はすべて政府統計から機械的に取得したものです。割合とスコアの算出のみこちらで行っています。</p>
-    </div>
-    <div class="sources">
-      <div class="source">
-        <span class="k">着工（年度）</span>
-        <span class="v">総務省「社会・人口統計体系」Ｈ 居住<span>建築着工統計をまとめた統計。都道府県1975〜2024年度、市区町村2000〜2024年度</span></span>
-      </div>
-      <div class="source">
-        <span class="k">着工（月次）</span>
-        <span class="v">国土交通省「住宅着工統計 時系列表」<span>都道府県別着工戸数。2005年4月〜2024年12月</span></span>
-      </div>
-      <div class="source">
-        <span class="k">人口・世帯・年齢・移動</span>
-        <span class="v">総務省「社会・人口統計体系」Ａ 人口・世帯<span>国勢調査・人口推計・住民基本台帳ベース</span></span>
-      </div>
-      <div class="source">
-        <span class="k">将来推計人口</span>
-        <span class="v">社人研「日本の地域別将来推計人口」<span>令和5(2023)年推計。2020年国勢調査を出発点に2050年まで</span></span>
-      </div>
-      <div class="source">
-        <span class="k">家計</span>
-        <span class="v">家計調査（二人以上の世帯）／全国家計構造調査<span>費目別支出は2000〜2025年、貯蓄・負債は5年ごと</span></span>
-      </div>
-      <div class="source">
-        <span class="k">住宅ストック</span>
-        <span class="v">住宅・土地統計調査<span>総住宅数・空き家数・持ち家数。5年ごと、直近は2023年</span></span>
-      </div>
-      <div class="source">
-        <span class="k">働く人</span>
-        <span class="v">賃金構造基本統計調査／職業安定業務統計／最低賃金<span>給与・初任給は2020〜2024年、就業者数は国勢調査</span></span>
-      </div>
-    </div>
-    <ul class="caveats">
-      <li><strong>着工の数字は2024年（2024年度）が最新です。</strong>e-Stat で公開されている住宅着工統計は、月次が2024年12月まで、年度次が2024年度までです。2025年以降の数値は反映されていません。</li>
-      <li><strong>住居費に住宅ローンの返済は入っていません。</strong>家計調査の「住居」は家賃と修繕費が中心です。持ち家世帯の実際の負担は、この金額より大きくなります。</li>
-      <li><strong>家計調査は県庁所在市を中心とした調査です。</strong>市区町村ごとの公表はなく、県内でも都市部と郡部で水準は異なります。目安としてお使いください。</li>
-      <li><strong>市区町村別の着工は「市」と「区」のみの公表です。</strong>町村分は公表されていないため、市区町村の一覧は987件になります。人口・世帯の一覧は1,913件すべて取得しています。</li>
-      <li><strong>市区町村の数値は「廃置分合処理済」の統計を使っています。</strong>平成の大合併などを現在の区域にそろえて過去の数値を組み替えた版で、合併による見かけ上の増減が入りません。</li>
-      <li><strong>福島県の13市町村は個別の将来推計値がありません。</strong>社人研の推計で「浜通り地域」として一括して扱われているためです。</li>
-      <li><strong>国勢調査ベースの数値は2020年が最新です。</strong>2025年調査の結果は、今回使った統計表にはまだ反映されていません。</li>
-    </ul>
-    <p class="footer" id="footer"></p>
-  </section>
-
+  <div class="panel" id="panel"></div>
 </div>
 
 <script type="application/json" id="report-data">__DATA__</script>
@@ -598,27 +370,45 @@
   "use strict";
 
   var DATA = JSON.parse(document.getElementById("report-data").textContent);
-  var N = DATA.national;
-  var PREFS = DATA.prefectures;
+  var META = DATA.meta;
+  var AREAS = DATA.areas;
+  var SERIES = DATA.series;
+  var BY_CODE = {};
+  AREAS.forEach(function (a) { BY_CODE[a.code] = a; });
+  var NATIONAL = BY_CODE["00000"];
+  var PREFS = AREAS.filter(function (a) { return a.level === "pref"; });
+  var CITIES = AREAS.filter(function (a) { return a.level === "city"; });
+  var CITIES_BY_PREF = {};
+  CITIES.forEach(function (c) {
+    (CITIES_BY_PREF[c.prefCode] = CITIES_BY_PREF[c.prefCode] || []).push(c);
+  });
 
-  // ---- 表示ヘルパー -------------------------------------------------------
+  var SPEND_NAMES = { food: "食料", housing: "住居", utility: "光熱・水道",
+    furniture: "家具・家事用品", clothing: "被服・履物", health: "保健医療",
+    transport: "交通・通信", education: "教育", leisure: "教養娯楽", other: "その他" };
+  var QCLASS = { "狙い目": "q1", "過熱気味": "q2", "供給過剰の芽": "q3", "冷え込み": "q4" };
+
+  var state = { pref: "00000", city: "", tab: "overview" };
+  var PENDING = [];
+
+  // ---------- 表示ヘルパー ----------
+  function has(v) { return v !== null && v !== undefined; }
   function num(v, d) {
-    if (v === null || v === undefined) return "—";
-    return v.toLocaleString("ja-JP", { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+    if (!has(v)) return "—";
+    return v.toLocaleString("ja-JP",
+      { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
   }
   function man(v) {
-    if (v === null || v === undefined) return "—";
-    return (v / 10000).toLocaleString("ja-JP", { maximumFractionDigits: 0 });
+    if (!has(v)) return "—";
+    return (v / 10000).toLocaleString("ja-JP", { maximumFractionDigits: v < 1e6 ? 1 : 0 });
   }
   function pct(v, d) {
-    if (v === null || v === undefined) return "—";
-    var n = d === undefined ? 1 : d;
-    return (v > 0 ? "+" : "") + v.toFixed(n) + "%";
+    if (!has(v)) return "—";
+    return (v > 0 ? "+" : "") + v.toFixed(d === undefined ? 1 : d) + "%";
   }
-  function signed(v) {
-    if (v === null || v === undefined) return "—";
-    return (v > 0 ? "+" : "") + num(v);
-  }
+  function fixed(v, d) { return has(v) ? v.toFixed(d === undefined ? 1 : d) : "—"; }
+  function signed(v) { return has(v) ? (v > 0 ? "+" : "") + num(v) : "—"; }
+  function tone(v) { return !has(v) ? "" : (v >= 0 ? "up" : "down"); }
   function el(tag, cls, text) {
     var e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -628,13 +418,10 @@
   var SVGNS = "http://www.w3.org/2000/svg";
   function s(tag, attrs) {
     var e = document.createElementNS(SVGNS, tag);
-    for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) e.setAttribute(k, attrs[k]);
+    for (var k in attrs) if (has(attrs[k])) e.setAttribute(k, attrs[k]);
     return e;
   }
-  function css(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  }
-  function toneClass(v) { return v >= 0 ? "up" : "down"; }
+  function css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
 
   function makeTip(wrap) {
     var tip = el("div", "tip");
@@ -651,53 +438,28 @@
       hide: function () { tip.hidden = true; }
     };
   }
-
-  function axisText(svg, x, y, text, anchor, color, size, weight) {
+  function tipRow(color, label, value) {
+    return '<div class="row"><i style="background:' + (color ? css(color) : "transparent") +
+      '"></i>' + label + "<b>" + value + "</b></div>";
+  }
+  function txt(svg, x, y, text, anchor, color, size, weight) {
     var t = s("text", { x: x, y: y, "text-anchor": anchor || "middle",
-      fill: css(color || "--ink-muted"), "font-size": size || 11,
-      "font-weight": weight || 400 });
+      fill: css(color || "--ink-muted"), "font-size": size || 11, "font-weight": weight || 400 });
     t.textContent = text;
     svg.appendChild(t);
     return t;
   }
+  function ymLabel(code) {
+    var p = code.split("-");
+    return p[0] + "年" + Number(p[1]) + "月";
+  }
+  function empty(wrap, msg) {
+    wrap.appendChild(el("p", "empty", msg || "この地域のデータがありません。"));
+  }
 
-  // ---- ヘッダ -------------------------------------------------------------
-  var latestMonth = DATA.monthly[DATA.monthly.length - 1];
-  document.getElementById("stamp").textContent =
-    "着工 " + N.startsYear + "年度（月次は" + latestMonth.y + "年" + latestMonth.m + "月まで）／" +
-    "家計 " + N.spendYear + "年／給与 " + N.wageYear + "年／人口 2020年国勢調査＋2050年推計／" +
-    "全国・47都道府県・" + num(DATA.cities.length) + "市区町村";
-
-  document.getElementById("footer").textContent =
-    "作成：SUMUS コンサル事業部／データ取得日 2026年9月10日。e-Stat API および社人研の公表資料から取得。";
-
-  // ---- 着工サマリー -------------------------------------------------------
-  var firstYear = DATA.annualTypes[0], lastYear = DATA.annualTypes[DATA.annualTypes.length - 1];
-  document.getElementById("starts-lede").textContent =
-    firstYear.year + "年に" + man(firstYear.total) + "万戸あった新設住宅着工は、" +
-    lastYear.year + "年に" + man(lastYear.total) + "万戸まで減りました。" +
-    Math.round((1 - lastYear.total / firstYear.total) * 100) + "％の縮小です。" +
-    "直近の" + N.startsYear + "年度は" + num(N.starts) + "戸で、前年から" + pct(N.startsChg) + "でした。";
-
-  document.getElementById("monthly-sub").textContent =
-    "国土交通省 住宅着工統計 時系列表／" + DATA.monthly[0].y + "年" + DATA.monthly[0].m + "月〜" +
-    latestMonth.y + "年" + latestMonth.m + "月";
-
-  var startTiles = [
-    { label: "着工 総戸数", value: num(N.starts), unit: "戸", delta: N.startsChg,
-      sub: N.startsYear + "年度（4月〜翌年3月）" },
-    { label: "持家", value: num(N.owner), unit: "戸", delta: N.ownerChg,
-      sub: "工務店の主戦場。全体の" + (N.owner / N.starts * 100).toFixed(0) + "％" },
-    { label: "貸家", value: num(N.rent), unit: "戸", delta: null,
-      sub: "全体の" + (N.rent / N.starts * 100).toFixed(0) + "％で最も多い" },
-    { label: "分譲住宅", value: num(N.sale), unit: "戸", delta: null,
-      sub: "マンションと一戸建の合計" }
-  ];
-  renderTiles("starts-tiles", startTiles);
-
-  function renderTiles(id, items) {
-    var box = document.getElementById(id);
-    box.textContent = "";
+  // ---------- 画面の部品 ----------
+  function tiles(items) {
+    var box = el("div", "tiles");
     items.forEach(function (t) {
       var d = el("div", "tile");
       d.appendChild(el("span", "label", t.label));
@@ -705,651 +467,349 @@
       v.appendChild(document.createTextNode(t.value));
       if (t.unit) v.appendChild(el("span", "unit", t.unit));
       d.appendChild(v);
-      if (t.delta !== null && t.delta !== undefined) {
-        d.appendChild(el("span", "delta " + toneClass(t.delta), pct(t.delta) + "  前年比"));
-      }
-      d.appendChild(el("span", "sub", t.sub));
+      if (has(t.delta)) d.appendChild(el("span", "delta " + tone(t.delta), pct(t.delta) + " 前年比"));
+      if (t.sub) d.appendChild(el("span", "sub", t.sub));
       box.appendChild(d);
     });
+    return box;
   }
 
-  // ---- 図：月次の着工 -----------------------------------------------------
-  function drawMonthly(wrap) {
-    var rows = DATA.monthly;
-    var W = Math.max(wrap.clientWidth, 300), H = Math.min(Math.max(W * 0.38, 240), 330);
-    var m = { t: 14, r: 14, b: 32, l: 52 };
-    var iw = W - m.l - m.r, ih = H - m.t - m.b;
-    var maxV = 0;
-    rows.forEach(function (r) { if (r.total > maxV) maxV = r.total; });
-    var y1 = Math.ceil(maxV / 20000) * 20000;
-    var X = function (i) { return m.l + i / (rows.length - 1) * iw; };
-    var Y = function (v) { return m.t + ih - v / y1 * ih; };
-
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "新設住宅着工戸数の月次推移" });
-
-    for (var v = 0; v <= y1; v += 40000) {
-      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
-        stroke: css("--grid"), "stroke-width": 1 }));
-      axisText(svg, m.l - 8, Y(v) + 4, (v / 10000) + "万", "end");
+  function figure(title, sub, legendItems, drawFn) {
+    var f = el("figure");
+    var cap = el("figcaption");
+    cap.appendChild(el("span", "title", title));
+    if (sub) cap.appendChild(el("span", "sub", sub));
+    f.appendChild(cap);
+    if (legendItems && legendItems.length) {
+      var lg = el("div", "legend");
+      legendItems.forEach(function (l) {
+        var sp = el("span");
+        var i = el("i", l.shape || "");
+        i.style.background = css(l.color);
+        if (l.dash) i.style.backgroundImage =
+          "repeating-linear-gradient(90deg," + css(l.color) + " 0 5px,transparent 5px 8px)";
+        sp.appendChild(i);
+        sp.appendChild(document.createTextNode(l.label));
+        lg.appendChild(sp);
+      });
+      f.appendChild(lg);
     }
-    axisText(svg, m.l - 8, m.t - 3, "戸", "end");
-
-    rows.forEach(function (r, i) {
-      if (r.m === 1 && r.y % 3 === 0) {
-        axisText(svg, X(i), H - 11, r.y, "middle");
-        svg.appendChild(s("line", { x1: X(i), x2: X(i), y1: m.t, y2: m.t + ih,
-          stroke: css("--grid"), "stroke-width": 1 }));
-      }
-    });
-    svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih,
-      stroke: css("--axis"), "stroke-width": 1 }));
-
-    [["total", "--s1"], ["owner", "--s2"]].forEach(function (cfg) {
-      var d = rows.map(function (r, i) { return (i ? "L" : "M") + X(i) + " " + Y(r[cfg[0]]); }).join(" ");
-      svg.appendChild(s("path", { d: d, fill: "none", stroke: css(cfg[1]),
-        "stroke-width": 1.6, "stroke-linejoin": "round" }));
-    });
-
-    wrap.appendChild(svg);
-    var tip = makeTip(wrap);
-    var hair = s("line", { y1: m.t, y2: m.t + ih, stroke: css("--axis"), "stroke-width": 1, opacity: 0 });
-    svg.appendChild(hair);
-    var dot1 = s("circle", { r: 4, fill: css("--s1"), stroke: css("--surface"), "stroke-width": 2, opacity: 0 });
-    var dot2 = s("circle", { r: 4, fill: css("--s2"), stroke: css("--surface"), "stroke-width": 2, opacity: 0 });
-    svg.appendChild(dot1); svg.appendChild(dot2);
-
-    svg.addEventListener("mousemove", function (ev) {
-      var box = svg.getBoundingClientRect();
-      var px = (ev.clientX - box.left) * (W / box.width);
-      var i = Math.round((px - m.l) / iw * (rows.length - 1));
-      if (i < 0 || i >= rows.length) return;
-      var r = rows[i];
-      hair.setAttribute("x1", X(i)); hair.setAttribute("x2", X(i)); hair.setAttribute("opacity", .5);
-      dot1.setAttribute("cx", X(i)); dot1.setAttribute("cy", Y(r.total)); dot1.setAttribute("opacity", 1);
-      dot2.setAttribute("cx", X(i)); dot2.setAttribute("cy", Y(r.owner)); dot2.setAttribute("opacity", 1);
-      tip.show('<div class="tip-t">' + r.y + "年" + r.m + "月</div>" +
-        '<div class="row"><i style="background:' + css("--s1") + '"></i>総戸数<b>' + num(r.total) + "戸</b></div>" +
-        '<div class="row"><i style="background:' + css("--s2") + '"></i>持家<b>' + num(r.owner) + "戸</b></div>" +
-        '<div class="row"><i style="background:transparent"></i>貸家<b>' + num(r.rent) + "戸</b></div>" +
-        '<div class="row"><i style="background:transparent"></i>分譲<b>' + num(r.sale) + "戸</b></div>",
-        X(i) * (box.width / W), Y(r.total) * (box.height / H));
-    });
-    svg.addEventListener("mouseleave", function () {
-      tip.hide(); hair.setAttribute("opacity", 0);
-      dot1.setAttribute("opacity", 0); dot2.setAttribute("opacity", 0);
-    });
+    var wrap = el("div", "chart-wrap");
+    f.appendChild(wrap);
+    PENDING.push({ wrap: wrap, draw: drawFn });
+    return f;
   }
 
-  // ---- 住宅種類別の小さいグラフ -------------------------------------------
-  var TYPES = [
-    { key: "total", name: "総戸数" },
-    { key: "owner", name: "持家" },
-    { key: "rent", name: "貸家" },
-    { key: "sale", name: "分譲住宅" },
-    { key: "mansion", name: "分譲マンション" },
-    { key: "detached", name: "分譲一戸建" }
-  ];
-
-  function renderTypeSmall() {
-    var box = document.getElementById("type-small");
-    box.textContent = "";
-    var rows = DATA.annualTypes;
-    var first = rows[0], last = rows[rows.length - 1], prev = rows[rows.length - 2];
-    TYPES.forEach(function (t) {
-      var card = el("div", "small");
-      var head = el("div", "head");
-      head.appendChild(el("span", "nm", t.name));
-      var d = ((last[t.key] / prev[t.key]) - 1) * 100;
-      head.appendChild(el("span", "dl " + toneClass(d), pct(d) + " 前年比"));
-      card.appendChild(head);
-      var v = el("div", "val");
-      v.appendChild(document.createTextNode(num(last[t.key])));
-      v.appendChild(el("span", "unit", "戸"));
-      card.appendChild(v);
-      card.appendChild(el("span", "sub",
-        first.year + "年 " + num(first[t.key]) + "戸 → " +
-        pct(((last[t.key] / first[t.key]) - 1) * 100, 0)));
-      var wrap = el("div", "chart-wrap");
-      card.appendChild(wrap);
-      box.appendChild(card);
-      drawSpark(wrap, rows, t.key);
-    });
-
-    document.getElementById("type-note").textContent =
-      first.year + "年と" + last.year + "年の比較です。月次データを暦年で合計しているため、" +
-      "年度（4月〜翌年3月）で集計した他の数値とは範囲が少しずれます。";
+  function notice(html) {
+    var n = el("div", "notice");
+    n.innerHTML = html;
+    return n;
   }
 
-  function drawSpark(wrap, rows, key) {
-    var W = Math.max(wrap.clientWidth, 160), H = 62;
-    var m = { t: 8, r: 4, b: 14, l: 4 };
-    var iw = W - m.l - m.r, ih = H - m.t - m.b;
-    var maxV = 0;
-    rows.forEach(function (r) { if (r[key] > maxV) maxV = r[key]; });
-    var X = function (i) { return m.l + i / (rows.length - 1) * iw; };
-    var Y = function (v) { return m.t + ih - v / maxV * ih; };
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H,
-      role: "img", "aria-label": key + "の推移" });
-    var line = rows.map(function (r, i) { return (i ? "L" : "M") + X(i) + " " + Y(r[key]); }).join(" ");
-    svg.appendChild(s("path", { d: line + " L" + X(rows.length - 1) + " " + (m.t + ih) +
-      " L" + X(0) + " " + (m.t + ih) + " Z", fill: css("--s1"), opacity: .12 }));
-    svg.appendChild(s("path", { d: line, fill: "none", stroke: css("--s1"), "stroke-width": 1.8,
-      "stroke-linejoin": "round" }));
-    svg.appendChild(s("circle", { cx: X(rows.length - 1), cy: Y(rows[rows.length - 1][key]),
-      r: 3.2, fill: css("--s1"), stroke: css("--surface"), "stroke-width": 2 }));
-    axisText(svg, m.l, H - 3, rows[0].year, "start", "--ink-muted", 10);
-    axisText(svg, m.l + iw, H - 3, rows[rows.length - 1].year, "end", "--ink-muted", 10);
-    wrap.appendChild(svg);
+  function headline(title, text) {
+    var h = el("div", "headline");
+    h.appendChild(el("h2", null, title));
+    if (text) h.appendChild(el("p", null, text));
+    return h;
   }
 
-  // ---- 需要の土台 ---------------------------------------------------------
-  var lastIdx = DATA.indexed[DATA.indexed.length - 1];
-  var firstIdx = DATA.indexed[0];
-  renderTiles("demand-tiles", [
-    { label: "世帯数（2020年）", value: man(N.hh2020), unit: "万世帯", delta: null,
-      sub: "2000年から " + pct(N.hhChg) + "。人口が横ばいでも世帯は増えた" },
-    { label: "平均世帯人員", value: N.size2020.toFixed(2), unit: "人", delta: null,
-      sub: "1980年 " + firstIdx.size.toFixed(2) + "人から縮小。単独世帯が " + N.single2020.toFixed(0) + "％" },
-    { label: "2050年の総人口", value: man(N.pop2050), unit: "万人", delta: null,
-      sub: "2020年 " + man(N.pop2020) + "万人から " + pct(N.chg2050) },
-    { label: "高齢化率 2050年", value: N.aging2050.toFixed(1), unit: "%", delta: null,
-      sub: "2020年 " + N.aging2020.toFixed(1) + "％から上昇" }
-  ]);
+  function niceTicks(lo, hi, count) {
+    var span = hi - lo;
+    if (span <= 0) return [lo];
+    var raw = span / count;
+    var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+    var step = [1, 2, 2.5, 5, 10].map(function (x) { return x * mag; })
+      .filter(function (x) { return x >= raw; })[0] || 10 * mag;
+    var out = [], v = Math.ceil(lo / step) * step;
+    while (v <= hi && out.length < 9) { out.push(Number(v.toFixed(6))); v += step; }
+    return out;
+  }
 
-  function drawIndexed(wrap) {
-    var rows = DATA.indexed;
-    var W = Math.max(wrap.clientWidth, 280), H = Math.min(Math.max(W * 0.55, 220), 300);
-    var m = { t: 14, r: 96, b: 30, l: 42 };
-    var iw = W - m.l - m.r, ih = H - m.t - m.b;
-    var x0 = 1980, x1 = 2020, y0 = 90, y1 = 165;
-    var X = function (v) { return m.l + (v - x0) / (x1 - x0) * iw; };
-    var Y = function (v) { return m.t + ih - (v - y0) / (y1 - y0) * ih; };
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "人口と世帯数の推移" });
-    [100, 120, 140, 160].forEach(function (v) {
-      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
-        stroke: v === 100 ? css("--axis") : css("--grid"), "stroke-width": 1 }));
-      axisText(svg, m.l - 8, Y(v) + 4, v, "end");
-    });
-    rows.forEach(function (r, i) {
-      if (i % 2 === 0) axisText(svg, X(r.year), H - 10, r.year, "middle");
-    });
-    [["hh", "--s1", "世帯数"], ["pop", "--s2", "人口"]].forEach(function (c) {
-      var d = rows.map(function (r, i) { return (i ? "L" : "M") + X(r.year) + " " + Y(r[c[0]]); }).join(" ");
-      svg.appendChild(s("path", { d: d, fill: "none", stroke: css(c[1]), "stroke-width": 2,
-        "stroke-linejoin": "round" }));
-      rows.forEach(function (r) {
-        svg.appendChild(s("circle", { cx: X(r.year), cy: Y(r[c[0]]), r: 3,
-          fill: css(c[1]), stroke: css("--surface"), "stroke-width": 2 }));
+  // ---------- グラフ ----------
+  function lineChart(opts) {
+    return function (wrap) {
+      var W = Math.max(wrap.clientWidth, 280);
+      var H = Math.min(Math.max(W * (opts.ratio || 0.44), 220), opts.maxH || 320);
+      var m = { t: 14, r: opts.rightPad || 16, b: 30, l: opts.leftPad || 54 };
+      var iw = W - m.l - m.r, ih = H - m.t - m.b;
+      var labels = opts.labels;
+      var series = (opts.series || []).filter(function (se) {
+        return se.values && se.values.some(has);
       });
-      var lr = rows[rows.length - 1];
-      axisText(svg, X(lr.year) + 9, Y(lr[c[0]]) + 4, c[2] + " " + lr[c[0]].toFixed(1),
-        "start", "--ink-2", 12, 600);
-    });
-    wrap.appendChild(svg);
-    var tip = makeTip(wrap);
-    svg.addEventListener("mousemove", function (ev) {
-      var box = svg.getBoundingClientRect();
-      var px = (ev.clientX - box.left) * (W / box.width);
-      var year = x0 + (px - m.l) / iw * (x1 - x0);
-      var row = rows.reduce(function (b, p) { return Math.abs(p.year - year) < Math.abs(b.year - year) ? p : b; });
-      if (Math.abs(row.year - year) > 4) { tip.hide(); return; }
-      tip.show('<div class="tip-t">' + row.year + "年</div>" +
-        '<div class="row"><i style="background:' + css("--s1") + '"></i>世帯数<b>' + man(row.hhRaw) + "万世帯</b></div>" +
-        '<div class="row"><i style="background:' + css("--s2") + '"></i>人口<b>' + man(row.popRaw) + "万人</b></div>" +
-        '<div class="row"><i style="background:transparent"></i>1世帯<b>' + row.size.toFixed(2) + "人</b></div>",
-        X(row.year) * (box.width / W), Y(row.hh) * (box.height / H));
-    });
-    svg.addEventListener("mouseleave", tip.hide);
-  }
+      if (!series.length || labels.length < 2) { empty(wrap); return; }
 
-  function drawPopulation(wrap) {
-    var proj = DATA.futureNational;
-    var series = DATA.indexed.map(function (r) { return { year: r.year, value: r.popRaw }; });
-    var W = Math.max(wrap.clientWidth, 280), H = Math.min(Math.max(W * 0.55, 220), 300);
-    var m = { t: 14, r: 14, b: 30, l: 50 };
-    var iw = W - m.l - m.r, ih = H - m.t - m.b;
-    var x0 = 1980, x1 = 2050, y0 = 100e6, y1 = 132e6;
-    var X = function (v) { return m.l + (v - x0) / (x1 - x0) * iw; };
-    var Y = function (v) { return m.t + ih - (v - y0) / (y1 - y0) * ih; };
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "総人口の推移と推計" });
-    [100e6, 110e6, 120e6, 130e6].forEach(function (v) {
-      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
-        stroke: css("--grid"), "stroke-width": 1 }));
-      axisText(svg, m.l - 8, Y(v) + 4, (v / 1e4).toLocaleString("ja-JP"), "end");
-    });
-    axisText(svg, m.l - 8, m.t - 3, "万人", "end");
-    [1980, 2000, 2020, 2035, 2050].forEach(function (v) {
-      axisText(svg, X(v), H - 10, v, "middle");
-    });
-    svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih,
-      stroke: css("--axis"), "stroke-width": 1 }));
-    function path(pts) {
-      return pts.map(function (p, i) { return (i ? "L" : "M") + X(p.year) + " " + Y(p.value); }).join(" ");
-    }
-    svg.appendChild(s("path", { d: path(series), fill: "none", stroke: css("--s1"),
-      "stroke-width": 2, "stroke-linejoin": "round" }));
-    svg.appendChild(s("path", { d: path(proj), fill: "none", stroke: css("--s2"),
-      "stroke-width": 2, "stroke-dasharray": "6 4" }));
-    var end = proj[proj.length - 1];
-    svg.appendChild(s("circle", { cx: X(end.year), cy: Y(end.value), r: 4.5, fill: css("--s2"),
-      stroke: css("--surface"), "stroke-width": 2 }));
-    axisText(svg, X(end.year) - 8, Y(end.value) + 18, "2050年 " + man(end.value) + "万人",
-      "end", "--ink-2", 12, 600);
-    wrap.appendChild(svg);
-    var tip = makeTip(wrap);
-    var all = series.concat(proj);
-    svg.addEventListener("mousemove", function (ev) {
-      var box = svg.getBoundingClientRect();
-      var px = (ev.clientX - box.left) * (W / box.width);
-      var year = x0 + (px - m.l) / iw * (x1 - x0);
-      var row = all.reduce(function (b, p) { return Math.abs(p.year - year) < Math.abs(b.year - year) ? p : b; });
-      if (Math.abs(row.year - year) > 5) { tip.hide(); return; }
-      var kind = row.year > 2020 ? "推計" : "実績";
-      tip.show('<div class="tip-t">' + row.year + "年（" + kind + "）</div>" +
-        '<div class="row"><i style="background:' + css(row.year > 2020 ? "--s2" : "--s1") + '"></i>総人口<b>' +
-        man(row.value) + "万人</b></div>",
-        X(row.year) * (box.width / W), Y(row.value) * (box.height / H));
-    });
-    svg.addEventListener("mouseleave", tip.hide);
-  }
+      var all = [];
+      series.forEach(function (se) { se.values.forEach(function (v) { if (has(v)) all.push(v); }); });
+      var lo = opts.zero ? 0 : Math.min.apply(null, all);
+      var hi = Math.max.apply(null, all);
+      if (opts.zero) hi *= 1.08;
+      else { var pad = (hi - lo) * 0.12 || 1; lo -= pad; hi += pad; }
+      var X = function (i) { return m.l + i / (labels.length - 1) * iw; };
+      var Y = function (v) { return m.t + ih - (v - lo) / (hi - lo) * ih; };
 
-  function drawAge(wrap) {
-    var rows = DATA.ageMix;
-    var W = Math.max(wrap.clientWidth, 300), H = Math.min(Math.max(W * 0.36, 240), 320);
-    var m = { t: 12, r: 10, b: 44, l: 36 };
-    var iw = W - m.l - m.r, ih = H - m.t - m.b;
-    var step = iw / rows.length, bw = Math.min(step - 10, 46);
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "年齢3区分別の構成比の推移" });
-    [0, 25, 50, 75, 100].forEach(function (v) {
-      var y = m.t + ih - v / 100 * ih;
-      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: y, y2: y, stroke: css("--grid"), "stroke-width": 1 }));
-      axisText(svg, m.l - 8, y + 4, v, "end");
-    });
-    var bands = [["young", "--ord-1", "15歳未満"], ["work", "--ord-2", "15〜64歳"], ["old", "--ord-3", "65歳以上"]];
-    var tip = null;
-    rows.forEach(function (r, i) {
-      var cx = m.l + step * i + step / 2, acc = 0;
-      bands.forEach(function (b) {
-        var v = r[b[0]], h = v / 100 * ih;
-        var y = m.t + ih - (acc + v) / 100 * ih;
-        var rect = s("rect", { x: cx - bw / 2, y: y, width: bw, height: Math.max(h - 2, 1),
-          fill: css(b[1]), rx: 1 });
-        rect.addEventListener("mouseenter", function () {
-          var box = svg.getBoundingClientRect();
-          tip.show('<div class="tip-t">' + r.year + "年（" + r.kind + "）</div>" +
-            bands.map(function (bb) {
-              return '<div class="row"><i style="background:' + css(bb[1]) + '"></i>' + bb[2] +
-                "<b>" + r[bb[0]].toFixed(1) + "%</b></div>";
-            }).join(""), cx * (box.width / W), y * (box.height / H));
-        });
-        rect.addEventListener("mouseleave", function () { tip.hide(); });
-        svg.appendChild(rect);
-        acc += v;
-      });
-      axisText(svg, cx, H - 24, r.year, "middle");
-      if (r.year === 1980 || r.year === 2020 || r.year === 2050) {
-        axisText(svg, cx, m.t + (r.old / 100 * ih) / 2 + 4, r.old.toFixed(1) + "%",
-          "middle", "--ord-3-ink", 11.5, 600);
-      }
-    });
-    var splitX = m.l + step * 9;
-    svg.appendChild(s("line", { x1: splitX, x2: splitX, y1: m.t, y2: m.t + ih,
-      stroke: css("--axis"), "stroke-width": 1 }));
-    axisText(svg, m.l + step * 4.5, H - 7, "実績", "middle");
-    axisText(svg, splitX + step * 1.5, H - 7, "推計", "middle");
-    wrap.appendChild(svg);
-    tip = makeTip(wrap);
-  }
-
-  // ---- 家計 ---------------------------------------------------------------
-  var SPEND_NAMES = {
-    food: "食料", housing: "住居", utility: "光熱・水道", furniture: "家具・家事用品",
-    clothing: "被服・履物", health: "保健医療", transport: "交通・通信",
-    education: "教育", leisure: "教養娯楽", other: "その他"
-  };
-
-  var housingShare = N.spendHousing / N.spend * 100;
-  document.getElementById("kakei-lede").textContent =
-    "二人以上の世帯の月あたり消費支出は全国平均 " + num(N.spend) + "円。" +
-    "このうち住居費は " + num(N.spendHousing) + "円で、家計の " + housingShare.toFixed(1) + "％にとどまります。" +
-    "ただしこの「住居」には住宅ローンの返済が含まれません。持ち家世帯の実際の住居関連支出は、" +
-    "この数字よりずっと大きくなります。";
-
-  document.getElementById("breakdown-sub").textContent =
-    "家計調査 " + DATA.spendBreakdownYear + "年／1世帯あたり月額";
-
-  renderTiles("kakei-tiles", [
-    { label: "消費支出", value: num(N.spend), unit: "円/月", delta: null,
-      sub: N.spendYear + "年・二人以上の世帯の全国平均" },
-    { label: "うち住居費", value: num(N.spendHousing), unit: "円/月", delta: null,
-      sub: "家計の " + housingShare.toFixed(1) + "％。ローン返済は含まれません" },
-    { label: "家具・家事用品", value: num(N.spendFurniture), unit: "円/月", delta: null,
-      sub: "リフォームや家具の購買力を見る目安" },
-    { label: "住宅・土地のための負債", value: num(N.debtHousing / 10), unit: "万円", delta: null,
-      sub: "1世帯あたり平均。貯蓄は " + num(N.savings / 10) + "万円" }
-  ]);
-
-  function drawBreakdown(wrap) {
-    var rows = DATA.spendBreakdown.slice().sort(function (a, b) { return b.value - a.value; });
-    var W = Math.max(wrap.clientWidth, 280);
-    var rowH = 26, m = { t: 8, r: 62, b: 8, l: 104 };
-    var H = m.t + rows.length * rowH + m.b;
-    var iw = W - m.l - m.r;
-    var maxV = rows[0].value;
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "費目別の月額支出" });
-    var tip = null;
-    rows.forEach(function (r, i) {
-      var y = m.t + i * rowH;
-      var w = Math.max(r.value / maxV * iw, 2);
-      var rect = s("rect", { x: m.l, y: y + 5, width: w, height: rowH - 12,
-        fill: css(r.key === "housing" ? "--s2" : "--s1"), rx: 2 });
-      rect.addEventListener("mouseenter", function () {
-        var box = svg.getBoundingClientRect();
-        tip.show('<div class="tip-t">' + SPEND_NAMES[r.key] + "</div>" +
-          '<div class="row"><i style="background:' + css(r.key === "housing" ? "--s2" : "--s1") + '"></i>月額<b>' +
-          num(r.value) + "円</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>構成比<b>' +
-          (r.value / N.spend * 100).toFixed(1) + "%</b></div>",
-          (m.l + w / 2) * (box.width / W), y * (box.height / H));
-      });
-      rect.addEventListener("mouseleave", function () { tip.hide(); });
-      svg.appendChild(rect);
-      var nm = axisText(svg, m.l - 8, y + rowH / 2 + 4, SPEND_NAMES[r.key], "end", "--ink", 12);
-      nm.setAttribute("font-family", css("--sans") || "sans-serif");
-      axisText(svg, m.l + w + 6, y + rowH / 2 + 4, num(r.value), "start", "--ink-2", 11.5);
-    });
-    wrap.appendChild(svg);
-    tip = makeTip(wrap);
-  }
-
-  function drawSpendTrend(wrap) {
-    var rows = DATA.spendSeries;
-    var W = Math.max(wrap.clientWidth, 280), H = Math.min(Math.max(W * 0.55, 230), 310);
-    var gap = 22;
-    var m = { t: 14, r: 14, b: 28, l: 52 };
-    var iw = W - m.l - m.r;
-    var paneH = (H - m.t - m.b - gap) / 2;
-    var x0 = rows[0].year, x1 = rows[rows.length - 1].year;
-    var X = function (v) { return m.l + (v - x0) / (x1 - x0) * iw; };
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "消費支出と住居費の推移" });
-
-    function pane(top, key, color, label, ticks) {
-      var vals = rows.map(function (r) { return r[key]; }).filter(function (v) { return v; });
-      var lo = Math.min.apply(null, vals) * 0.92, hi = Math.max.apply(null, vals) * 1.05;
-      var Y = function (v) { return top + paneH - (v - lo) / (hi - lo) * paneH; };
-      ticks.forEach(function (v) {
-        if (v < lo || v > hi) return;
+      var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H,
+        role: "img", "aria-label": opts.aria || "推移" });
+      niceTicks(lo, hi, 4).forEach(function (v) {
         svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
           stroke: css("--grid"), "stroke-width": 1 }));
-        axisText(svg, m.l - 8, Y(v) + 4, num(v), "end", "--ink-muted", 10.5);
+        txt(svg, m.l - 8, Y(v) + 4, opts.fmtY ? opts.fmtY(v) : num(v), "end");
       });
-      var d = rows.filter(function (r) { return r[key]; })
-        .map(function (r, i) { return (i ? "L" : "M") + X(r.year) + " " + Y(r[key]); }).join(" ");
-      svg.appendChild(s("path", { d: d, fill: "none", stroke: css(color), "stroke-width": 2,
-        "stroke-linejoin": "round" }));
-      var last = rows[rows.length - 1];
-      svg.appendChild(s("circle", { cx: X(last.year), cy: Y(last[key]), r: 3.6, fill: css(color),
-        stroke: css("--surface"), "stroke-width": 2 }));
-      axisText(svg, m.l + 2, top + 10, label, "start", "--ink-2", 11.5, 600);
-      return Y;
-    }
+      if (opts.unitY) txt(svg, m.l - 8, m.t - 3, opts.unitY, "end");
+      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: m.t + ih, y2: m.t + ih,
+        stroke: css("--axis"), "stroke-width": 1 }));
+      (opts.xTicks || []).forEach(function (t) {
+        if (t.i < 0 || t.i >= labels.length) return;
+        txt(svg, X(t.i), H - 10, t.label, "middle");
+      });
 
-    pane(m.t, "total", "--s1", "消費支出（円/月）", [260000, 280000, 300000, 320000]);
-    pane(m.t + paneH + gap, "housing", "--s2", "住居費（円/月）", [16000, 18000, 20000, 22000]);
-    [2000, 2005, 2010, 2015, 2020, 2025].forEach(function (v) {
-      if (v >= x0 && v <= x1) axisText(svg, X(v), H - 9, v, "middle");
-    });
-    wrap.appendChild(svg);
-    var tip = makeTip(wrap);
-    svg.addEventListener("mousemove", function (ev) {
-      var box = svg.getBoundingClientRect();
-      var px = (ev.clientX - box.left) * (W / box.width);
-      var year = x0 + (px - m.l) / iw * (x1 - x0);
-      var row = rows.reduce(function (b, p) { return Math.abs(p.year - year) < Math.abs(b.year - year) ? p : b; });
-      if (Math.abs(row.year - year) > 2) { tip.hide(); return; }
-      tip.show('<div class="tip-t">' + row.year + "年</div>" +
-        '<div class="row"><i style="background:' + css("--s1") + '"></i>消費支出<b>' + num(row.total) + "円</b></div>" +
-        '<div class="row"><i style="background:' + css("--s2") + '"></i>住居費<b>' + num(row.housing) + "円</b></div>",
-        X(row.year) * (box.width / W), (m.t + 30) * (box.height / H));
-    });
-    svg.addEventListener("mouseleave", tip.hide);
-  }
+      series.forEach(function (se) {
+        var d = "", started = false;
+        se.values.forEach(function (v, i) {
+          if (!has(v)) { started = false; return; }
+          d += (started ? "L" : "M") + X(i) + " " + Y(v) + " ";
+          started = true;
+        });
+        svg.appendChild(s("path", { d: d, fill: "none", stroke: css(se.color),
+          "stroke-width": se.width || 2, "stroke-linejoin": "round", "stroke-linecap": "round",
+          "stroke-dasharray": se.dash || null }));
+        if (opts.dots) {
+          se.values.forEach(function (v, i) {
+            if (has(v)) svg.appendChild(s("circle", { cx: X(i), cy: Y(v), r: 3,
+              fill: css(se.color), stroke: css("--surface"), "stroke-width": 2 }));
+          });
+        }
+      });
 
-  // ---- 働く人 -------------------------------------------------------------
-  var wageSorted = PREFS.filter(function (p) { return p.wageM; })
-    .sort(function (a, b) { return b.wageM - a.wageM; });
-  var wageTop = wageSorted[0], wageBottom = wageSorted[wageSorted.length - 1];
-  document.getElementById("work-lede").textContent =
-    "所定内給与額（男性）は全国平均 " + num(N.wageM) + "千円。最も高い" + wageTop.name + "の " +
-    num(wageTop.wageM) + "千円と、最も低い" + wageBottom.name + "の " + num(wageBottom.wageM) +
-    "千円では " + ((wageTop.wageM / wageBottom.wageM - 1) * 100).toFixed(0) +
-    "％の開きがあります。募集条件を全国一律で決めると、採れる地域と採れない地域が分かれます。";
-
-  renderTiles("work-tiles", [
-    { label: "所定内給与（男）", value: num(N.wageM), unit: "千円/月", delta: null,
-      sub: N.wageYear + "年・全国平均。女性は " + num(N.wageF) + "千円" },
-    { label: "大卒初任給（男）", value: num(N.gradUniM), unit: "千円/月", delta: null,
-      sub: "高卒（男）は " + num(N.gradHighM) + "千円" },
-    { label: "最低賃金", value: num(N.minWage), unit: "円/時", delta: null,
-      sub: "全国加重平均。県によって差があります" },
-    { label: "有効求人倍率", value: N.jobRatio.toFixed(2), unit: "倍", delta: null,
-      sub: N.jobYear + "年・全国。1倍を超えると求人が求職を上回る" }
-  ]);
-
-  // ---- 都道府県 -----------------------------------------------------------
-  var prefUp = PREFS.filter(function (p) { return p.startsChg > 0; }).length;
-  document.getElementById("pref-lede").textContent =
-    N.startsYear + "年度に着工が前年より増えたのは " + prefUp + "都道府県、減ったのは " +
-    (47 - prefUp) + "都道府県でした。全国では " + pct(N.startsChg) +
-    "です。着工は年による振れが大きいため、単年の増減だけで地域の実力を判断しないようにしてください。";
-
-  document.getElementById("pref-bar-sub").textContent =
-    N.startsYear + "年度 vs " + (Number(N.startsYear) - 1) + "年度／社会・人口統計体系（建築着工統計ベース）";
-
-  function drawPrefBar(wrap) {
-    var rows = PREFS.filter(function (p) { return p.startsChg !== null; })
-      .slice().sort(function (a, b) { return b.startsChg - a.startsChg; });
-    var W = Math.max(wrap.clientWidth, 300);
-    var rowH = 21, m = { t: 24, r: 14, b: 10, l: 72 };
-    var H = m.t + rows.length * rowH + m.b;
-    var iw = W - m.l - m.r;
-    var lim = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.startsChg); }));
-    lim = Math.ceil(lim / 5) * 5;
-    var X = function (v) { return m.l + (v + lim) / (2 * lim) * iw; };
-    var zero = X(0);
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "都道府県別の着工前年比" });
-    rows.forEach(function (r, i) {
-      if (i % 2 === 1) svg.appendChild(s("rect", { x: 0, y: m.t + i * rowH, width: W,
-        height: rowH, fill: css("--surface-sunk") }));
-    });
-    var stepTick = lim > 30 ? 20 : 10;
-    for (var v = -lim; v <= lim; v += stepTick) {
-      svg.appendChild(s("line", { x1: X(v), x2: X(v), y1: m.t - 6, y2: H - m.b,
-        stroke: v === 0 ? css("--axis") : css("--grid"), "stroke-width": 1 }));
-      axisText(svg, X(v), 13, (v > 0 ? "+" : "") + v + "%", "middle");
-    }
-    var tip = null;
-    rows.forEach(function (r, i) {
-      var y = m.t + i * rowH, v = r.startsChg, pos = v >= 0;
-      var x = pos ? zero : X(v), w = Math.max(Math.abs(X(v) - zero), 1.5);
-      var rect = s("rect", { x: x, y: y + 4, width: w, height: rowH - 9,
-        fill: css(pos ? "--s1" : "--s2"), rx: 2 });
-      rect.addEventListener("mouseenter", function () {
+      wrap.appendChild(svg);
+      var tip = makeTip(wrap);
+      var hair = s("line", { y1: m.t, y2: m.t + ih, stroke: css("--axis"),
+        "stroke-width": 1, opacity: 0 });
+      svg.appendChild(hair);
+      svg.addEventListener("mousemove", function (ev) {
         var box = svg.getBoundingClientRect();
-        tip.show('<div class="tip-t">' + r.name + "</div>" +
-          '<div class="row"><i style="background:' + css(pos ? "--s1" : "--s2") + '"></i>着工 前年比<b>' + pct(v) + "</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>着工戸数<b>' + num(r.starts) + "戸</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>うち持家<b>' + num(r.owner) + "戸</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>世帯千あたり<b>' + r.startsPer1k + "戸</b></div>",
-          (x + w / 2) * (box.width / W), (y + 2) * (box.height / H));
+        var px = (ev.clientX - box.left) * (W / box.width);
+        var i = Math.round((px - m.l) / iw * (labels.length - 1));
+        if (i < 0 || i >= labels.length) { tip.hide(); hair.setAttribute("opacity", 0); return; }
+        var html = '<div class="tip-t">' + labels[i] + "</div>";
+        var anchor = null;
+        series.forEach(function (se) {
+          if (!has(se.values[i])) return;
+          if (anchor === null) anchor = se.values[i];
+          html += tipRow(se.color, se.label,
+            (opts.fmtTip ? opts.fmtTip(se.values[i]) : num(se.values[i])) + (opts.unit || ""));
+        });
+        if (anchor === null) { tip.hide(); hair.setAttribute("opacity", 0); return; }
+        hair.setAttribute("x1", X(i)); hair.setAttribute("x2", X(i));
+        hair.setAttribute("opacity", .5);
+        tip.show(html, X(i) * (box.width / W), Y(anchor) * (box.height / H));
       });
-      rect.addEventListener("mouseleave", function () { tip.hide(); });
-      svg.appendChild(rect);
-      var nm = axisText(svg, m.l - 8, y + rowH / 2 + 4, r.name, "end", "--ink", 12);
-      nm.setAttribute("font-family", css("--sans") || "sans-serif");
-      axisText(svg, pos ? zero + w + 6 : X(v) - 6, y + rowH / 2 + 4, pct(v),
-        pos ? "start" : "end", "--ink-2", 11);
-    });
-    wrap.appendChild(svg);
-    tip = makeTip(wrap);
+      svg.addEventListener("mouseleave", function () {
+        tip.hide(); hair.setAttribute("opacity", 0);
+      });
+    };
   }
 
-  // ---- 市区町村 -----------------------------------------------------------
-  var q = DATA.quadrantCounts;
-  document.getElementById("city-lede").textContent =
-    "着工が公表されている " + num(DATA.cities.length) + "市区町村を、人の出入り（需要）と着工（供給）の" +
-    "2つの軸で4つに分けました。「狙い目」は " + num(q["狙い目"] || 0) + "件、「冷え込み」は " +
-    num(q["冷え込み"] || 0) + "件です。同じ県の中でも区分は分かれます。県単位の判断では、この差は見えません。";
-
-  document.getElementById("scatter-sub").textContent =
-    "横軸＝転入超過（" + DATA.citySocialYear + "年・世帯1,000あたり）／縦軸＝着工戸数（" +
-    DATA.cityStartsYear + "年度・世帯1,000あたり）／境目は全市区町村の中央値";
-
-  document.getElementById("city-cap").textContent =
-    "着工は" + DATA.cityStartsYear + "年度、転入超過は" + DATA.citySocialYear +
-    "年、世帯数は2020年国勢調査。見出しをクリックすると並べ替えできます。";
-
-  document.getElementById("kakei-cap").textContent =
-    "家計調査 " + N.spendYear + "年（貯蓄・負債は直近の公表年）。1世帯あたりの月額と残高です。";
-
-  document.getElementById("work-cap").textContent =
-    "給与・初任給は" + N.wageYear + "年（月額・千円）、最低賃金は時給、有効求人倍率は" + N.jobYear + "年。";
-
-  function drawScatter(wrap) {
-    var rows = DATA.cities.filter(function (c) {
-      return c.socialPer1k !== null && c.startsPer1k !== null;
-    });
-    var topSet = {};
-    DATA.cityTop.forEach(function (c) { topSet[c.code] = true; });
-    var W = Math.max(wrap.clientWidth, 300), H = Math.min(Math.max(W * 0.6, 320), 460);
-    var m = { t: 16, r: 16, b: 40, l: 52 };
-    var iw = W - m.l - m.r, ih = H - m.t - m.b;
-    // 極端な外れ値で潰れないよう、表示範囲を絞る（範囲外は端に寄せて表示）
-    var xlo = -40, xhi = 45, ylo = 0, yhi = 40;
-    var X = function (v) { return m.l + (Math.min(Math.max(v, xlo), xhi) - xlo) / (xhi - xlo) * iw; };
-    var Y = function (v) { return m.t + ih - (Math.min(Math.max(v, ylo), yhi) - ylo) / (yhi - ylo) * ih; };
-    var dmid = DATA.quadrantMid.demand, smid = DATA.quadrantMid.supply;
-
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "市区町村の需要と供給の散布図" });
-
-    // 4区分の下地。右下＝狙い目、左上＝供給過剰の芽
-    svg.appendChild(s("rect", { x: X(dmid), y: Y(smid), width: m.l + iw - X(dmid),
-      height: m.t + ih - Y(smid), fill: css("--wash-good") }));
-    svg.appendChild(s("rect", { x: m.l, y: m.t, width: X(dmid) - m.l, height: Y(smid) - m.t,
-      fill: css("--wash-warn") }));
-
-    [0, 10, 20, 30, 40].forEach(function (v) {
-      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
-        stroke: css("--grid"), "stroke-width": 1 }));
-      axisText(svg, m.l - 8, Y(v) + 4, v, "end");
-    });
-    [-40, -20, 0, 20, 40].forEach(function (v) {
-      svg.appendChild(s("line", { x1: X(v), x2: X(v), y1: m.t, y2: m.t + ih,
-        stroke: css("--grid"), "stroke-width": 1 }));
-      axisText(svg, X(v), H - 22, (v > 0 ? "+" : "") + v, "middle");
-    });
-    svg.appendChild(s("line", { x1: X(dmid), x2: X(dmid), y1: m.t, y2: m.t + ih,
-      stroke: css("--axis"), "stroke-width": 1 }));
-    svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(smid), y2: Y(smid),
-      stroke: css("--axis"), "stroke-width": 1 }));
-
-    axisText(svg, m.l + iw - 6, m.t + ih - 8, "狙い目", "end", "--brand-teal-ink", 12, 600);
-    axisText(svg, m.l + iw - 6, m.t + 14, "過熱気味", "end", "--ink-muted", 12, 600);
-    axisText(svg, m.l + 6, m.t + 14, "供給過剰の芽", "start", "--ink-muted", 12, 600);
-    axisText(svg, m.l + 6, m.t + ih - 8, "冷え込み", "start", "--ink-muted", 12, 600);
-    axisText(svg, m.l + iw / 2, H - 6, "転入超過（世帯1,000あたり・人）", "middle", "--ink-muted", 11);
-    axisText(svg, m.l - 8, m.t - 4, "戸", "end", "--ink-muted", 10.5);
-
-    var tip = null;
-    rows.forEach(function (c) {
-      var hot = topSet[c.code];
-      var r = Math.max(Math.min(Math.sqrt(c.hh2020 || 1000) / 90, 7), 2.5);
-      var dot = s("circle", { cx: X(c.socialPer1k), cy: Y(c.startsPer1k), r: r,
-        fill: css(hot ? "--s1" : "--ink-muted"), opacity: hot ? .95 : .38,
-        stroke: css("--surface"), "stroke-width": hot ? 1.5 : 0 });
-      dot.addEventListener("mouseenter", function () {
-        var box = svg.getBoundingClientRect();
-        tip.show('<div class="tip-t">' + c.pref + " " + c.name + "</div>" +
-          '<div class="row"><i style="background:' + css(hot ? "--s1" : "--ink-muted") + '"></i>区分<b>' + (c.quadrant || "—") + "</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>転入超過/千世帯<b>' + c.socialPer1k + "人</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>着工/千世帯<b>' + c.startsPer1k + "戸</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>狙い目スコア<b>' + (c.score > 0 ? "+" : "") + c.score + "</b></div>",
-          X(c.socialPer1k) * (box.width / W), Y(c.startsPer1k) * (box.height / H));
-      });
-      dot.addEventListener("mouseleave", function () { tip.hide(); });
-      svg.appendChild(dot);
-    });
-    wrap.appendChild(svg);
-    tip = makeTip(wrap);
-  }
-
-  function drawScoreBar(wrap, rows, positive) {
-    var W = Math.max(wrap.clientWidth, 280);
-    var rowH = 24, m = { t: 8, r: 54, b: 8, l: 118 };
-    var H = m.t + rows.length * rowH + m.b;
-    var iw = W - m.l - m.r;
-    var lim = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.score); }));
-    var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img",
-      "aria-label": "狙い目スコア" });
-    var tip = null;
-    rows.forEach(function (r, i) {
-      var y = m.t + i * rowH;
-      var w = Math.max(Math.abs(r.score) / lim * iw, 2);
-      var rect = s("rect", { x: m.l, y: y + 4, width: w, height: rowH - 10,
-        fill: css(positive ? "--s1" : "--s2"), rx: 2 });
-      rect.addEventListener("mouseenter", function () {
-        var box = svg.getBoundingClientRect();
-        tip.show('<div class="tip-t">' + r.pref + " " + r.name + "</div>" +
-          '<div class="row"><i style="background:' + css(positive ? "--s1" : "--s2") + '"></i>スコア<b>' +
-          (r.score > 0 ? "+" : "") + r.score + "</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>転入超過/千世帯<b>' + r.socialPer1k + "人</b></div>" +
-          '<div class="row"><i style="background:transparent"></i>着工/千世帯<b>' + r.startsPer1k + "戸</b></div>",
-          (m.l + w / 2) * (box.width / W), y * (box.height / H));
-      });
-      rect.addEventListener("mouseleave", function () { tip.hide(); });
-      svg.appendChild(rect);
-      var nm = axisText(svg, m.l - 8, y + rowH / 2 + 4, r.name, "end", "--ink", 12);
-      nm.setAttribute("font-family", css("--sans") || "sans-serif");
-      axisText(svg, m.l + w + 6, y + rowH / 2 + 4,
-        (r.score > 0 ? "+" : "") + r.score.toFixed(1), "start", "--ink-2", 11);
-    });
-    wrap.appendChild(svg);
-    tip = makeTip(wrap);
-  }
-
-  // ---- 表 -----------------------------------------------------------------
-  function buildTable(tableId, cols, rows, defaultSort, opts) {
+  function rankedBars(rows, opts) {
     opts = opts || {};
-    var table = document.getElementById(tableId);
-    var thead = el("thead"), tr = el("tr");
-    var state = { key: defaultSort && defaultSort.key, dir: defaultSort && defaultSort.dir === "asc" ? 1 : -1,
-                  txt: defaultSort && defaultSort.txt, filter: "", limit: opts.limit || rows.length };
+    return function (wrap) {
+      var W = Math.max(wrap.clientWidth, 280);
+      var rowH = opts.rowH || 24;
+      var m = { t: opts.axis ? 24 : 6, r: 60, b: 8, l: opts.leftPad || 92 };
+      var H = m.t + rows.length * rowH + m.b;
+      var iw = W - m.l - m.r;
+      var vals = rows.map(function (r) { return r.value; }).filter(has);
+      if (!vals.length) { empty(wrap, "データがありません。"); return; }
+      var maxAbs = Math.max.apply(null, vals.map(Math.abs));
+      var anyNeg = vals.some(function (v) { return v < 0; });
+      var lo = anyNeg ? -maxAbs : 0, hi = maxAbs || 1;
+      var X = function (v) { return m.l + (v - lo) / (hi - lo) * iw; };
+      var zero = X(anyNeg ? 0 : lo);
 
+      var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H,
+        role: "img", "aria-label": opts.aria || "順位" });
+      rows.forEach(function (r, i) {
+        if (i % 2 === 1) svg.appendChild(s("rect", { x: 0, y: m.t + i * rowH,
+          width: W, height: rowH, fill: css("--surface-sunk") }));
+      });
+      if (opts.axis) {
+        niceTicks(lo, hi, 4).forEach(function (v) {
+          svg.appendChild(s("line", { x1: X(v), x2: X(v), y1: m.t - 5, y2: H - m.b,
+            stroke: v === 0 ? css("--axis") : css("--grid"), "stroke-width": 1 }));
+          txt(svg, X(v), 13, opts.fmtAxis ? opts.fmtAxis(v) : num(v), "middle");
+        });
+      }
+      var tip = null;
+      rows.forEach(function (r, i) {
+        var y = m.t + i * rowH;
+        if (r.current) svg.appendChild(s("rect", { x: 0, y: y, width: W, height: rowH,
+          fill: css("--wash-good") }));
+        if (has(r.value)) {
+          var pos = r.value >= 0;
+          var x = pos ? zero : X(r.value);
+          var w = Math.max(Math.abs(X(r.value) - zero), 1.5);
+          var rect = s("rect", { x: x, y: y + 4, width: w, height: rowH - 9,
+            fill: css(r.color || (pos ? "--s1" : "--s2")), rx: 2 });
+          rect.addEventListener("mouseenter", function () {
+            var box = svg.getBoundingClientRect();
+            tip.show('<div class="tip-t">' + r.label + "</div>" + (r.tip || ""),
+              (x + w / 2) * (box.width / W), y * (box.height / H));
+          });
+          rect.addEventListener("mouseleave", function () { tip.hide(); });
+          svg.appendChild(rect);
+          txt(svg, pos ? zero + w + 6 : X(r.value) - 6, y + rowH / 2 + 4,
+            opts.fmtValue ? opts.fmtValue(r.value) : num(r.value),
+            pos ? "start" : "end", "--ink-2", 11);
+        }
+        var nm = txt(svg, m.l - 8, y + rowH / 2 + 4, r.label, "end",
+          r.current ? "--brand-ink" : "--ink", 12, r.current ? 700 : 400);
+        nm.setAttribute("font-family", css("--sans") || "sans-serif");
+      });
+      wrap.appendChild(svg);
+      tip = makeTip(wrap);
+    };
+  }
+
+  function ageChart(rows) {
+    return function (wrap) {
+      if (!rows || !rows.length) { empty(wrap); return; }
+      var W = Math.max(wrap.clientWidth, 280);
+      var H = Math.min(Math.max(W * 0.42, 230), 300);
+      var m = { t: 12, r: 10, b: 42, l: 34 };
+      var iw = W - m.l - m.r, ih = H - m.t - m.b;
+      var step = iw / rows.length, bw = Math.min(step - 9, 44);
+      var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H,
+        role: "img", "aria-label": "年齢3区分の構成比" });
+      [0, 25, 50, 75, 100].forEach(function (v) {
+        var y = m.t + ih - v / 100 * ih;
+        svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: y, y2: y,
+          stroke: css("--grid"), "stroke-width": 1 }));
+        txt(svg, m.l - 7, y + 4, v, "end");
+      });
+      var bands = [[1, "--ord-1", "15歳未満"], [2, "--ord-2", "15〜64歳"], [3, "--ord-3", "65歳以上"]];
+      var tip = null, firstProj = -1;
+      rows.forEach(function (r, i) {
+        if (r[4] === 1 && firstProj < 0) firstProj = i;
+        var cx = m.l + step * i + step / 2, acc = 0;
+        bands.forEach(function (b) {
+          var v = r[b[0]], h = v / 100 * ih;
+          var y = m.t + ih - (acc + v) / 100 * ih;
+          var rect = s("rect", { x: cx - bw / 2, y: y, width: bw,
+            height: Math.max(h - 2, 1), fill: css(b[1]), rx: 1 });
+          rect.addEventListener("mouseenter", function () {
+            var box = svg.getBoundingClientRect();
+            tip.show('<div class="tip-t">' + r[0] + "年（" + (r[4] ? "推計" : "実績") + "）</div>" +
+              bands.map(function (bb) {
+                return tipRow(bb[1], bb[2], fixed(r[bb[0]]) + "%");
+              }).join(""), cx * (box.width / W), y * (box.height / H));
+          });
+          rect.addEventListener("mouseleave", function () { tip.hide(); });
+          svg.appendChild(rect);
+          acc += v;
+        });
+        if (rows.length < 9 || i % 2 === 0) txt(svg, cx, H - 24, r[0], "middle");
+        if (i === 0 || i === rows.length - 1) {
+          txt(svg, cx, m.t + (r[3] / 100 * ih) / 2 + 4, fixed(r[3]) + "%", "middle",
+            "--ord-3-ink", 11, 600);
+        }
+      });
+      if (firstProj > 0) {
+        var sx = m.l + step * firstProj;
+        svg.appendChild(s("line", { x1: sx, x2: sx, y1: m.t, y2: m.t + ih,
+          stroke: css("--axis"), "stroke-width": 1 }));
+        txt(svg, m.l + (sx - m.l) / 2, H - 6, "実績", "middle");
+        txt(svg, sx + (m.l + iw - sx) / 2, H - 6, "推計", "middle");
+      }
+      wrap.appendChild(svg);
+      tip = makeTip(wrap);
+    };
+  }
+
+  function scatterChart(rows, currentCode) {
+    return function (wrap) {
+      var W = Math.max(wrap.clientWidth, 280);
+      var H = Math.min(Math.max(W * 0.58, 300), 440);
+      var m = { t: 16, r: 16, b: 42, l: 48 };
+      var iw = W - m.l - m.r, ih = H - m.t - m.b;
+      var xlo = -40, xhi = 45, ylo = 0, yhi = 40;
+      var X = function (v) { return m.l + (Math.min(Math.max(v, xlo), xhi) - xlo) / (xhi - xlo) * iw; };
+      var Y = function (v) { return m.t + ih - (Math.min(Math.max(v, ylo), yhi) - ylo) / (yhi - ylo) * ih; };
+      var dmid = META.quadrantMid.demand, smid = META.quadrantMid.supply;
+      var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H,
+        role: "img", "aria-label": "需要と供給の4区分" });
+      svg.appendChild(s("rect", { x: X(dmid), y: Y(smid), width: m.l + iw - X(dmid),
+        height: m.t + ih - Y(smid), fill: css("--wash-good") }));
+      svg.appendChild(s("rect", { x: m.l, y: m.t, width: X(dmid) - m.l,
+        height: Y(smid) - m.t, fill: css("--wash-warn") }));
+      [0, 10, 20, 30, 40].forEach(function (v) {
+        svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
+          stroke: css("--grid"), "stroke-width": 1 }));
+        txt(svg, m.l - 7, Y(v) + 4, v, "end");
+      });
+      [-40, -20, 0, 20, 40].forEach(function (v) {
+        svg.appendChild(s("line", { x1: X(v), x2: X(v), y1: m.t, y2: m.t + ih,
+          stroke: css("--grid"), "stroke-width": 1 }));
+        txt(svg, X(v), H - 24, (v > 0 ? "+" : "") + v, "middle");
+      });
+      svg.appendChild(s("line", { x1: X(dmid), x2: X(dmid), y1: m.t, y2: m.t + ih,
+        stroke: css("--axis"), "stroke-width": 1 }));
+      svg.appendChild(s("line", { x1: m.l, x2: m.l + iw, y1: Y(smid), y2: Y(smid),
+        stroke: css("--axis"), "stroke-width": 1 }));
+      txt(svg, m.l + iw - 6, m.t + ih - 8, "狙い目", "end", "--brand-ink", 12, 600);
+      txt(svg, m.l + iw - 6, m.t + 14, "過熱気味", "end", "--ink-muted", 12, 600);
+      txt(svg, m.l + 6, m.t + 14, "供給過剰の芽", "start", "--ink-muted", 12, 600);
+      txt(svg, m.l + 6, m.t + ih - 8, "冷え込み", "start", "--ink-muted", 12, 600);
+      txt(svg, m.l + iw / 2, H - 6, "転入超過（世帯1,000あたり・人）", "middle", "--ink-muted", 11);
+      txt(svg, m.l - 7, m.t - 4, "戸", "end", "--ink-muted", 10.5);
+
+      var tip = null, current = null;
+      rows.forEach(function (c) {
+        var isNow = c.code === currentCode;
+        var r = Math.max(Math.min(Math.sqrt(c.hh2020 || 1000) / 95, 7), 2.5);
+        var dot = s("circle", { cx: X(c.socialPer1k), cy: Y(c.startsPer1k),
+          r: isNow ? Math.max(r, 6) : r,
+          fill: css(isNow ? "--s1" : "--ink-muted"), opacity: isNow ? 1 : .32,
+          stroke: css("--surface"), "stroke-width": isNow ? 2 : 0 });
+        dot.addEventListener("mouseenter", function () {
+          var box = svg.getBoundingClientRect();
+          tip.show('<div class="tip-t">' + c.prefName + " " + c.name + "</div>" +
+            tipRow(isNow ? "--s1" : "--ink-muted", "区分", c.quadrant || "—") +
+            tipRow(null, "転入超過/千世帯", fixed(c.socialPer1k, 2) + "人") +
+            tipRow(null, "着工/千世帯", fixed(c.startsPer1k, 2) + "戸") +
+            tipRow(null, "狙い目スコア", (c.score > 0 ? "+" : "") + fixed(c.score, 2)),
+            X(c.socialPer1k) * (box.width / W), Y(c.startsPer1k) * (box.height / H));
+        });
+        dot.addEventListener("mouseleave", function () { tip.hide(); });
+        if (isNow) current = dot; else svg.appendChild(dot);
+      });
+      if (current) svg.appendChild(current);
+      wrap.appendChild(svg);
+      tip = makeTip(wrap);
+    };
+  }
+
+  // ---------- 表 ----------
+  function dataTable(cols, rows, opts) {
+    opts = opts || {};
+    var wrap = el("div", "table-wrap");
+    var table = el("table");
+    var thead = el("thead"), tr = el("tr");
+    var st = { key: opts.sortKey, dir: opts.sortDir === "asc" ? 1 : -1,
+               txt: false, limit: opts.limit || rows.length };
     cols.forEach(function (c) {
       var th = el("th", c.txt ? "txt" : "");
       th.appendChild(document.createTextNode(c.head));
       if (c.key) {
         th.classList.add("sortable");
         th.tabIndex = 0;
-        var arrow = el("span", "arrow", "↕");
-        th.appendChild(arrow);
-        var sort = function () {
-          var dir = (state.key === c.key && state.dir === -1) ? 1 : -1;
-          state.key = c.key; state.dir = dir; state.txt = c.txt;
-          markHeaders();
-          render();
+        th.appendChild(el("span", "arrow", "↕"));
+        var doSort = function () {
+          st.dir = (st.key === c.key && st.dir === -1) ? 1 : -1;
+          st.key = c.key; st.txt = !!c.txt;
+          mark(); render();
         };
-        th.addEventListener("click", sort);
+        th.addEventListener("click", doSort);
         th.addEventListener("keydown", function (e) {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sort(); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); doSort(); }
         });
       }
       tr.appendChild(th);
@@ -1358,188 +818,852 @@
     table.appendChild(thead);
     var tbody = el("tbody");
     table.appendChild(tbody);
+    wrap.appendChild(table);
 
-    function markHeaders() {
+    function mark() {
       cols.forEach(function (c, i) {
         var th = tr.children[i], a = th.querySelector(".arrow");
-        if (c.key === state.key) {
-          th.setAttribute("aria-sort", state.dir === -1 ? "descending" : "ascending");
-          if (a) a.textContent = state.dir === -1 ? "↓" : "↑";
-        } else {
-          th.removeAttribute("aria-sort");
-          if (a) a.textContent = "↕";
-        }
+        if (c.key && c.key === st.key) {
+          th.setAttribute("aria-sort", st.dir === -1 ? "descending" : "ascending");
+          if (a) a.textContent = st.dir === -1 ? "↓" : "↑";
+        } else { th.removeAttribute("aria-sort"); if (a) a.textContent = "↕"; }
       });
     }
 
-    function visible() {
-      var list = rows;
-      if (state.filter) {
-        var f = state.filter;
-        list = list.filter(function (r) {
-          return (r.name && r.name.indexOf(f) >= 0) || (r.pref && r.pref.indexOf(f) >= 0);
-        });
-      }
-      if (state.key) {
-        list = list.slice().sort(function (a, b) {
-          var av = a[state.key], bv = b[state.key];
-          if (av === null || av === undefined) return 1;
-          if (bv === null || bv === undefined) return -1;
-          if (state.txt) return String(av).localeCompare(String(bv), "ja") * state.dir;
-          return (av - bv) * state.dir;
-        });
-      }
-      return list;
-    }
-
     function render() {
-      var list = visible();
+      var list = rows.slice();
+      if (st.key) {
+        list.sort(function (a, b) {
+          var av = a[st.key], bv = b[st.key];
+          if (!has(av)) return 1;
+          if (!has(bv)) return -1;
+          if (st.txt) return String(av).localeCompare(String(bv), "ja") * st.dir;
+          return (av - bv) * st.dir;
+        });
+      }
       tbody.textContent = "";
-      list.slice(0, state.limit).forEach(function (r) {
+      list.slice(0, st.limit).forEach(function (r) {
         var row = el("tr");
+        if (opts.currentCode && r.code === opts.currentCode) row.classList.add("current");
         cols.forEach(function (c) {
           var td = el("td", c.cls || "");
           var out = c.render(r);
           if (typeof out === "string") td.textContent = out;
           else td.appendChild(out);
-          if (c.tone) {
-            var t = c.tone(r);
-            if (t) td.classList.add(t);
-          }
+          if (c.tone) { var t = c.tone(r); if (t) td.classList.add(t); }
           row.appendChild(td);
         });
+        if (opts.onPick) {
+          row.addEventListener("click", function () { opts.onPick(r); });
+          row.title = "クリックでこの地域に切り替え";
+        }
         tbody.appendChild(row);
       });
-      if (opts.onRender) opts.onRender(list.length, Math.min(state.limit, list.length));
+      if (opts.onRender) opts.onRender(list.length, Math.min(st.limit, list.length));
     }
-
-    markHeaders();
-    render();
-    return {
-      setFilter: function (v) { state.filter = v; state.limit = opts.limit || rows.length; render(); },
-      more: function (n) { state.limit += n; render(); },
-      render: render
-    };
+    mark(); render();
+    wrap.api = { more: function (n) { st.limit += n; render(); } };
+    return wrap;
   }
 
-  buildTable("kakei-table", [
-    { head: "都道府県", key: "name", txt: true, cls: "name txt", render: function (r) { return r.name; } },
-    { head: "消費支出/月", key: "spend", render: function (r) { return num(r.spend) + "円"; } },
-    { head: "うち住居費", key: "spendHousing", render: function (r) { return num(r.spendHousing) + "円"; } },
-    { head: "住居費の割合", key: "spendHousing", render: function (r) {
-        return r.spend ? (r.spendHousing / r.spend * 100).toFixed(1) + "%" : "—"; } },
-    { head: "家具・家事用品", key: "spendFurniture", render: function (r) { return num(r.spendFurniture) + "円"; } },
-    { head: "光熱・水道", key: "spendUtility", render: function (r) { return num(r.spendUtility) + "円"; } },
-    { head: "貯蓄", key: "savings", render: function (r) { return num(r.savings / 10) + "万円"; } },
-    { head: "住宅・土地の負債", key: "debtHousing", render: function (r) { return num(r.debtHousing / 10) + "万円"; } },
-    { head: "持ち家率", key: "ownedRate", render: function (r) { return r.ownedRate + "%"; } },
-    { head: "空き家率", key: "vacantRate", render: function (r) { return r.vacantRate + "%"; } }
-  ], PREFS, { key: "spend", dir: "desc" });
+  // ---------- 地域の選択 ----------
+  function currentArea() { return BY_CODE[state.city || state.pref] || NATIONAL; }
+  function parentPref() { return state.pref === "00000" ? NATIONAL : BY_CODE[state.pref]; }
 
-  buildTable("work-table", [
-    { head: "都道府県", key: "name", txt: true, cls: "name txt", render: function (r) { return r.name; } },
-    { head: "所定内給与（男）", key: "wageM", render: function (r) { return num(r.wageM) + "千円"; } },
-    { head: "所定内給与（女）", key: "wageF", render: function (r) { return num(r.wageF) + "千円"; } },
-    { head: "大卒初任給（男）", key: "gradUniM", render: function (r) { return num(r.gradUniM) + "千円"; } },
-    { head: "高卒初任給（男）", key: "gradHighM", render: function (r) { return num(r.gradHighM) + "千円"; } },
-    { head: "最低賃金", key: "minWage", render: function (r) { return num(r.minWage) + "円"; } },
-    { head: "有効求人倍率", key: "jobRatio", render: function (r) { return r.jobRatio ? r.jobRatio.toFixed(2) + "倍" : "—"; } },
-    { head: "第2次産業 就業者", key: "secondary", render: function (r) { return man(r.secondary) + "万人"; } },
-    { head: "第3次産業 就業者", key: "tertiary", render: function (r) { return man(r.tertiary) + "万人"; } }
-  ], PREFS, { key: "wageM", dir: "desc" });
+  function buildPrefSelect() {
+    var sel = document.getElementById("sel-pref");
+    sel.textContent = "";
+    sel.appendChild(new Option("全国", "00000"));
+    PREFS.forEach(function (p) { sel.appendChild(new Option(p.name, p.code)); });
+    sel.value = state.pref;
+  }
 
-  buildTable("pref-table", [
-    { head: "都道府県", key: "name", txt: true, cls: "name txt", render: function (r) { return r.name; } },
-    { head: "着工 総戸数", key: "starts", render: function (r) { return num(r.starts) + "戸"; } },
-    { head: "前年比", key: "startsChg", tone: function (r) { return toneClass(r.startsChg); },
-      render: function (r) { return pct(r.startsChg); } },
-    { head: "うち持家", key: "owner", render: function (r) { return num(r.owner) + "戸"; } },
-    { head: "持家 前年比", key: "ownerChg", tone: function (r) { return toneClass(r.ownerChg); },
-      render: function (r) { return pct(r.ownerChg); } },
-    { head: "着工/千世帯", key: "startsPer1k", render: function (r) { return r.startsPer1k + "戸"; } },
-    { head: "転入超過", key: "social", tone: function (r) { return toneClass(r.social); },
-      render: function (r) { return signed(r.social) + "人"; } },
-    { head: "世帯数", key: "hh2020", render: function (r) { return man(r.hh2020) + "万"; } },
-    { head: "世帯数 2000→20", key: "hhChg", render: function (r) { return pct(r.hhChg); } },
-    { head: "平均世帯人員", key: "size2020", render: function (r) { return r.size2020 + "人"; } },
-    { head: "高齢化率 2020", key: "aging2020", render: function (r) { return r.aging2020 + "%"; } },
-    { head: "人口 2020→2050", key: "chg2050", tone: function (r) { return toneClass(r.chg2050); },
-      render: function (r) { return pct(r.chg2050); } },
-    { head: "空き家率", key: "vacantRate", render: function (r) { return r.vacantRate + "%"; } },
-    { head: "消費支出/月", key: "spend", render: function (r) { return num(r.spend) + "円"; } }
-  ], PREFS, { key: "starts", dir: "desc" });
-
-  var QCLASS = { "狙い目": "q1", "過熱気味": "q2", "供給過剰の芽": "q3", "冷え込み": "q4" };
-  var cityTable = buildTable("city-table", [
-    { head: "市区町村", key: "name", txt: true, cls: "name txt", render: function (r) { return r.name; } },
-    { head: "都道府県", key: "pref", txt: true, cls: "sub txt", render: function (r) { return r.pref; } },
-    { head: "区分", key: "score", txt: true, cls: "txt", render: function (r) {
-        var sp = el("span", "pill " + (QCLASS[r.quadrant] || "q3"), r.quadrant || "—");
-        return sp; } },
-    { head: "狙い目スコア", key: "score", tone: function (r) { return r.score === null ? "" : toneClass(r.score); },
-      render: function (r) { return r.score === null ? "—" : (r.score > 0 ? "+" : "") + r.score.toFixed(1); } },
-    { head: "着工 戸数", key: "starts", render: function (r) { return num(r.starts) + "戸"; } },
-    { head: "前年比", key: "startsChg", tone: function (r) { return r.startsChg === null ? "" : toneClass(r.startsChg); },
-      render: function (r) { return pct(r.startsChg); } },
-    { head: "着工/千世帯", key: "startsPer1k", render: function (r) { return r.startsPer1k + "戸"; } },
-    { head: "転入超過/千世帯", key: "socialPer1k", tone: function (r) { return r.socialPer1k === null ? "" : toneClass(r.socialPer1k); },
-      render: function (r) { return r.socialPer1k === null ? "—" : (r.socialPer1k > 0 ? "+" : "") + r.socialPer1k; } },
-    { head: "持家の割合", key: "ownerShare", render: function (r) { return r.ownerShare === null ? "—" : r.ownerShare + "%"; } },
-    { head: "世帯数", key: "hh2020", render: function (r) { return num(r.hh2020); } },
-    { head: "人口 2020→2050", key: "chg2050", tone: function (r) { return r.chg2050 === null ? "" : toneClass(r.chg2050); },
-      render: function (r) { return pct(r.chg2050); } },
-    { head: "空き家率", key: "vacantRate", render: function (r) { return r.vacantRate === null ? "—" : r.vacantRate + "%"; } }
-  ], DATA.cities, { key: "score", dir: "desc" }, {
-    limit: 50,
-    onRender: function (total, shown) {
-      document.getElementById("city-count").textContent =
-        num(total) + "件中 " + num(shown) + "件を表示";
-      document.getElementById("city-more").hidden = shown >= total;
+  function buildCitySelect() {
+    var sel = document.getElementById("sel-city");
+    sel.textContent = "";
+    if (state.pref === "00000") {
+      sel.appendChild(new Option("都道府県を選ぶと使えます", ""));
+      sel.disabled = true;
+      sel.value = "";
+      return;
     }
-  });
+    sel.disabled = false;
+    var list = (CITIES_BY_PREF[state.pref.slice(0, 2)] || []).slice()
+      .sort(function (a, b) { return a.code.localeCompare(b.code); });
+    sel.appendChild(new Option("県全体（" + list.length + "市区町村）", ""));
+    list.forEach(function (c) {
+      sel.appendChild(new Option(c.name + (has(c.starts) ? "" : "（着工の公表なし）"), c.code));
+    });
+    sel.value = state.city;
+  }
 
-  document.getElementById("city-search").addEventListener("input", function (e) {
-    cityTable.setFilter(e.target.value.trim());
-  });
-  document.getElementById("city-more").addEventListener("click", function () {
-    cityTable.more(50);
-  });
+  function updateCrumb() {
+    var c = document.getElementById("crumb");
+    c.textContent = "";
+    var area = currentArea();
+    var parts = ["全国"];
+    if (state.pref !== "00000") parts.push(BY_CODE[state.pref].name);
+    if (state.city) parts.push(BY_CODE[state.city].name);
+    parts.forEach(function (p, i) {
+      if (i) c.appendChild(el("span", "sep", "›"));
+      c.appendChild(el(i === parts.length - 1 ? "b" : "span", null, p));
+    });
+    if (area.quadrant) {
+      var pill = el("span", "pill " + QCLASS[area.quadrant], area.quadrant);
+      pill.style.marginLeft = "6px";
+      c.appendChild(pill);
+    }
+  }
 
-  // ---- 描画とリサイズ -----------------------------------------------------
-  var charts = [
-    ["chart-monthly", drawMonthly],
-    ["chart-indexed", drawIndexed],
-    ["chart-population", drawPopulation],
-    ["chart-age", drawAge],
-    ["chart-breakdown", drawBreakdown],
-    ["chart-spend-trend", drawSpendTrend],
-    ["chart-pref", drawPrefBar],
-    ["chart-scatter", drawScatter],
-    ["chart-score-top", function (w) { drawScoreBar(w, DATA.cityTop, true); }],
-    ["chart-score-bottom", function (w) { drawScoreBar(w, DATA.cityBottom, false); }]
+  function setArea(code) {
+    var a = BY_CODE[code];
+    if (!a) return;
+    if (a.level === "national") { state.pref = "00000"; state.city = ""; }
+    else if (a.level === "pref") { state.pref = a.code; state.city = ""; }
+    else { state.pref = a.prefCode + "000"; state.city = a.code; }
+    save();
+    buildPrefSelect(); buildCitySelect(); updateCrumb(); renderTab();
+  }
+
+  function save() {
+    try { localStorage.setItem("compass", JSON.stringify(state)); } catch (e) { /* 保存不可でも動く */ }
+  }
+  function restore() {
+    try {
+      var raw = localStorage.getItem("compass");
+      if (!raw) return;
+      var v = JSON.parse(raw);
+      if (v && BY_CODE[v.pref]) state.pref = v.pref;
+      if (v && v.city && BY_CODE[v.city]) state.city = v.city;
+      if (v && v.tab) state.tab = v.tab;
+    } catch (e) { /* 読めなければ初期値 */ }
+  }
+
+  // ---------- タブ ----------
+  var TABS = [
+    { id: "overview", name: "概要" },
+    { id: "starts", name: "着工" },
+    { id: "population", name: "人口・世帯" },
+    { id: "kakei", name: "家計" },
+    { id: "work", name: "働く人" },
+    { id: "rank", name: "ランキング" },
+    { id: "about", name: "出典・注意" }
   ];
 
-  function renderCharts() {
-    charts.forEach(function (c) {
-      var wrap = document.getElementById(c[0]);
-      if (!wrap) return;
-      wrap.textContent = "";
-      c[1](wrap);
+  function buildTabs() {
+    var box = document.getElementById("tabs");
+    box.textContent = "";
+    TABS.forEach(function (t) {
+      var b = el("button", null, t.name);
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", String(state.tab === t.id));
+      b.addEventListener("click", function () {
+        state.tab = t.id; save(); buildTabs(); renderTab();
+      });
+      box.appendChild(b);
     });
-    renderTypeSmall();
   }
-  renderCharts();
+
+  function renderTab() {
+    var panel = document.getElementById("panel");
+    panel.textContent = "";
+    PENDING = [];
+    var map = { overview: tabOverview, starts: tabStarts, population: tabPopulation,
+      kakei: tabKakei, work: tabWork, rank: tabRank, about: tabAbout };
+    (map[state.tab] || tabOverview)(panel);
+    redrawCharts();
+  }
+
+  function redrawCharts() {
+    PENDING.forEach(function (p) { p.wrap.textContent = ""; p.draw(p.wrap); });
+  }
+
+  // ---------- 共通のグラフ ----------
+  function yearTicks(years, every) {
+    var out = [];
+    years.forEach(function (y, i) { if (y % every === 0) out.push({ i: i, label: y }); });
+    return out;
+  }
+
+  function monthTicks(labels, everyYears) {
+    var out = [];
+    labels.forEach(function (l, i) {
+      var p = l.split("-");
+      if (p[1] === "01" && Number(p[0]) % everyYears === 0) out.push({ i: i, label: p[0] });
+    });
+    return out;
+  }
+
+  function startsChart(area) {
+    var sr = SERIES[area.code] || {};
+    if (sr.m) {
+      return figure("新設住宅着工戸数の推移（月次）",
+        "国土交通省 住宅着工統計／" + ymLabel(META.months[0]) + "〜" +
+        ymLabel(META.months[META.months.length - 1]),
+        [{ color: "--s1", label: "総戸数" }, { color: "--s2", label: "持家" }],
+        lineChart({
+          labels: META.months.map(ymLabel),
+          xTicks: monthTicks(META.months, 3),
+          series: [{ label: "総戸数", color: "--s1", values: sr.m, width: 1.6 },
+                   { label: "持家", color: "--s2", values: sr.mo, width: 1.6 }],
+          zero: true, unit: "戸", unitY: "戸",
+          fmtY: function (v) { return v >= 10000 ? (v / 10000) + "万" : num(v); },
+          ratio: 0.36, maxH: 300, aria: "着工戸数の月次推移"
+        }));
+    }
+    var years = area.level === "city" ? META.cityStartsYears : META.startsYears;
+    return figure("新設住宅着工戸数の推移（年度）",
+      "社会・人口統計体系（建築着工統計ベース）／" + years[0] + "〜" +
+      years[years.length - 1] + "年度",
+      [{ color: "--s1", label: "総戸数" }, { color: "--s2", label: "持家" }],
+      lineChart({
+        labels: years.map(function (y) { return y + "年度"; }),
+        xTicks: yearTicks(years, 5),
+        series: [{ label: "総戸数", color: "--s1", values: sr.st || [] },
+                 { label: "持家", color: "--s2", values: sr.ow || [] }],
+        zero: true, unit: "戸", unitY: "戸", ratio: 0.4, dots: years.length < 30,
+        aria: "着工戸数の推移"
+      }));
+  }
+
+  function popChart(area) {
+    var sr = SERIES[area.code] || {};
+    var years = area.level === "city" ? META.censusYears : META.popYears;
+    var future = META.projYears.slice(1);
+    var labels = years.map(function (y) { return y + "年"; })
+      .concat(future.map(function (y) { return y + "年（推計）"; }));
+    var actual = (sr.pop || []).concat(future.map(function () { return null; }));
+    var proj = years.map(function () { return null; });
+    if (sr.fut) {
+      var i2020 = years.indexOf(2020);
+      if (i2020 >= 0) proj[i2020] = sr.fut[0];
+      proj = proj.concat(sr.fut.slice(1));
+    } else {
+      proj = proj.concat(future.map(function () { return null; }));
+    }
+    var ticks = [];
+    labels.forEach(function (l, i) {
+      var y = Number(l.slice(0, 4));
+      if (y % 10 === 0) ticks.push({ i: i, label: y });
+    });
+    return figure("総人口の推移と2050年までの推計",
+      "実績＝国勢調査・人口推計／推計＝社人研 令和5年推計",
+      [{ color: "--s1", label: "実績" }, { color: "--s2", label: "推計", dash: true }],
+      lineChart({
+        labels: labels, xTicks: ticks,
+        series: [{ label: "実績", color: "--s1", values: actual },
+                 { label: "推計", color: "--s2", values: proj, dash: "6 4" }],
+        unit: "", fmtY: function (v) { return num(v / 10000, v < 1e6 ? 1 : 0); },
+        fmtTip: function (v) { return man(v) + "万人"; },
+        unitY: "万人", ratio: 0.42, aria: "総人口の推移"
+      }));
+  }
+
+  function rankText(area, key, desc) {
+    if (area.level === "national" || !has(area[key])) return "";
+    var pool = area.level === "pref" ? PREFS : (CITIES_BY_PREF[area.prefCode] || []);
+    var vals = pool.filter(function (p) { return has(p[key]); })
+      .sort(function (a, b) { return desc ? b[key] - a[key] : a[key] - b[key]; });
+    for (var i = 0; i < vals.length; i++) {
+      if (vals[i].code === area.code) {
+        return (area.level === "pref" ? "47都道府県中" : area.prefName + "内") +
+          " " + (i + 1) + "位";
+      }
+    }
+    return "";
+  }
+
+  // ---------- タブの中身 ----------
+  function tabOverview(panel) {
+    var a = currentArea();
+    var isNat = a.level === "national";
+    panel.appendChild(headline(
+      (isNat ? "全国" : a.name) + "のようす",
+      isNat ? "住宅市場のいまを、着工・人口・世帯の3つの面から見た要約です。上の選択欄で都道府県や市区町村に切り替えられます。"
+            : "選んだ地域の主要な数字です。比較対象は" +
+              (a.level === "pref" ? "全国" : a.prefName) + "です。"));
+
+    panel.appendChild(tiles([
+      { label: "着工 総戸数", value: num(a.starts), unit: "戸", delta: a.startsChg,
+        sub: (a.startsYear ? a.startsYear + "年度" : "公表なし") +
+          (rankText(a, "starts", true) ? "／" + rankText(a, "starts", true) : "") },
+      { label: "うち持家", value: num(a.owner), unit: "戸",
+        sub: has(a.owner) && has(a.starts) ?
+          "着工の " + (a.owner / a.starts * 100).toFixed(0) + "％" : "" },
+      { label: "着工／世帯1,000", value: fixed(a.startsPer1k, 2), unit: "戸",
+        sub: isNat ? "世帯数に対する供給の多さ" : "全国は " + fixed(NATIONAL.startsPer1k, 2) + "戸" },
+      { label: "人口（2020年）", value: man(a.pop2020), unit: "万人",
+        sub: has(a.chg2050) ? "2050年に " + pct(a.chg2050) : "" },
+      { label: "世帯数（2020年）", value: man(a.hh2020), unit: "万世帯",
+        sub: has(a.hhChg) ? "2000年から " + pct(a.hhChg) : "" },
+      { label: "高齢化率（2020年）", value: fixed(a.aging2020), unit: "%",
+        sub: isNat ? "2050年に " + fixed(a.aging2050) + "％"
+                   : "全国は " + fixed(NATIONAL.aging2020) + "％" }
+    ]));
+
+    if (!has(a.starts) && a.level === "city") {
+      panel.appendChild(notice("<b>この市区町村は着工戸数の公表がありません。</b>" +
+        "建築着工統計の市区町村別は「市」と「区」のみが対象で、町村分は公表されていません。" +
+        "人口・世帯・年齢の数字はこのまま使えます。"));
+    }
+
+    panel.appendChild(startsChart(a));
+
+    var cols = el("div", "cols");
+    cols.appendChild(popChart(a));
+    cols.appendChild(figure("年齢3区分の構成比",
+      "2020年までが実績、2030年以降が社人研の推計",
+      [{ color: "--ord-1", label: "15歳未満", shape: "sq" },
+       { color: "--ord-2", label: "15〜64歳", shape: "sq" },
+       { color: "--ord-3", label: "65歳以上", shape: "sq" }],
+      ageChart((SERIES[a.code] || {}).age)));
+    panel.appendChild(cols);
+
+    if (has(a.score)) panel.appendChild(balancePanel(a));
+  }
+
+  function balancePanel(a) {
+    var m = el("div", "method");
+    m.appendChild(el("span", "k", "需要と供給のバランス"));
+    m.appendChild(el("p", null,
+      "転入超過（" + a.socialYear + "年）と着工（" + a.startsYear +
+      "年度）を、どちらも世帯1,000あたりに直して比べています。"));
+    m.appendChild(tiles([
+      { label: "狙い目スコア", value: (a.score > 0 ? "+" : "") + fixed(a.score, 2),
+        sub: "転入超過 − 着工（世帯1,000あたり）" },
+      { label: "転入超過／世帯1,000", value: (a.socialPer1k > 0 ? "+" : "") + fixed(a.socialPer1k, 2),
+        unit: "人", sub: "実数では " + signed(a.social) + "人" },
+      { label: "着工／世帯1,000", value: fixed(a.startsPer1k, 2), unit: "戸",
+        sub: "全国は " + fixed(NATIONAL.startsPer1k, 2) + "戸" },
+      { label: "区分", value: a.quadrant || "—", sub: "全市区町村の中央値を境目にした4区分" }
+    ]));
+    m.appendChild(el("p", null,
+      "スコアは公的な統計値ではなく、需要と供給の差を見るためにこちらで作った目安です。" +
+      "地震などの特殊事情がある年は数値が極端に振れることがあります。"));
+    return m;
+  }
+
+  function tabStarts(panel) {
+    var a = currentArea();
+    panel.appendChild(headline((a.level === "national" ? "全国" : a.name) + "の着工",
+      "新設住宅着工戸数を、持家・貸家・分譲の別に見ます。持家が工務店の主戦場です。"));
+
+    if (!has(a.starts)) {
+      panel.appendChild(notice("<b>この地域は着工戸数の公表がありません。</b>" +
+        "建築着工統計の市区町村別は「市」と「区」のみが対象です。" +
+        (a.level === "city" ? "上の市区町村欄で「県全体」を選ぶと、" + a.prefName +
+          "全体の数字が見られます。" : "")));
+      return;
+    }
+
+    panel.appendChild(tiles([
+      { label: "総戸数", value: num(a.starts), unit: "戸", delta: a.startsChg,
+        sub: a.startsYear + "年度（4月〜翌年3月）" },
+      { label: "持家", value: num(a.owner), unit: "戸", delta: a.ownerChg,
+        sub: has(a.owner) ? "全体の " + (a.owner / a.starts * 100).toFixed(0) + "％" : "" },
+      { label: "貸家", value: num(a.rent), unit: "戸",
+        sub: has(a.rent) ? "全体の " + (a.rent / a.starts * 100).toFixed(0) + "％" : "" },
+      { label: "分譲住宅", value: num(a.sale), unit: "戸",
+        sub: has(a.sale) ? "全体の " + (a.sale / a.starts * 100).toFixed(0) + "％" : "" }
+    ]));
+
+    panel.appendChild(startsChart(a));
+
+    var sr = SERIES[a.code] || {};
+    var years = a.level === "city" ? META.cityStartsYears : META.startsYears;
+    panel.appendChild(figure("利用関係別の推移（年度）",
+      "着工は年による振れが大きいため、単年の増減だけで判断しないでください。",
+      [{ color: "--s1", label: "持家" }, { color: "--s2", label: "貸家" },
+       { color: "--s3", label: "分譲住宅" }],
+      lineChart({
+        labels: years.map(function (y) { return y + "年度"; }),
+        xTicks: yearTicks(years, 5),
+        series: [{ label: "持家", color: "--s1", values: sr.ow || [] },
+                 { label: "貸家", color: "--s2", values: sr.re || [] },
+                 { label: "分譲住宅", color: "--s3", values: sr.sa || [] }],
+        zero: true, unit: "戸", unitY: "戸", ratio: 0.38, aria: "利用関係別の着工推移"
+      })));
+
+    if (has(a.stockTotal)) {
+      panel.appendChild(headline("住宅ストック",
+        "すでに建っている住宅の量です。リフォームや民泊の物件確保を考えるときの土台になります。"));
+      panel.appendChild(tiles([
+        { label: "総住宅数", value: man(a.stockTotal), unit: "万戸",
+          sub: a.stockYear + "年・住宅土地統計調査" },
+        { label: "空き家率", value: fixed(a.vacantRate), unit: "%",
+          sub: a.level === "national" ? "全国平均" : "全国は " + fixed(NATIONAL.vacantRate) + "％" },
+        { label: "持ち家率", value: fixed(a.ownedRate), unit: "%",
+          sub: a.level === "national" ? "全国平均" : "全国は " + fixed(NATIONAL.ownedRate) + "％" },
+        { label: "世帯あたり住宅数", value: fixed(a.stockTotal / a.hh2020, 2), unit: "戸",
+          sub: "1を超える分が空き家や別荘などです" }
+      ]));
+    }
+  }
+
+  function tabPopulation(panel) {
+    var a = currentArea();
+    var sr = SERIES[a.code] || {};
+    panel.appendChild(headline((a.level === "national" ? "全国" : a.name) + "の人口と世帯",
+      "住宅の必要数を決めるのは人数ではなく世帯数です。家族が小さく分かれるほど、同じ人数でも必要な家は増えます。"));
+
+    panel.appendChild(tiles([
+      { label: "人口（2020年）", value: man(a.pop2020), unit: "万人",
+        sub: has(a.popChg) ? "2000年から " + pct(a.popChg) : "" },
+      { label: "世帯数（2020年）", value: man(a.hh2020), unit: "万世帯",
+        sub: has(a.hhChg) ? "2000年から " + pct(a.hhChg) : "" },
+      { label: "平均世帯人員", value: fixed(a.size2020, 2), unit: "人",
+        sub: a.level === "national" ? "1980年は3.22人"
+                                    : "全国は " + fixed(NATIONAL.size2020, 2) + "人" },
+      { label: "単独世帯の割合", value: fixed(a.single2020), unit: "%",
+        sub: a.level === "national" ? "世帯の分かれ方の目安"
+                                    : "全国は " + fixed(NATIONAL.single2020) + "％" },
+      { label: "2050年の人口", value: man(a.pop2050), unit: "万人",
+        sub: has(a.chg2050) ? "2020年から " + pct(a.chg2050) : "推計がありません" },
+      { label: "高齢化率 2050年", value: fixed(a.aging2050), unit: "%",
+        sub: "2020年は " + fixed(a.aging2020) + "％" }
+    ]));
+
+    panel.appendChild(popChart(a));
+
+    var census = META.censusYears;
+    var popC = a.level === "city" ? (sr.pop || [])
+      : census.map(function (y) { return (sr.pop || [])[META.popYears.indexOf(y)]; });
+    var hhC = sr.hh || [];
+    var base = popC[0], baseH = hhC[0];
+    var cols = el("div", "cols");
+    cols.appendChild(figure("人口と世帯数の推移（1980年＝100）",
+      "世帯数の線が人口より上にあるほど、世帯の分かれ方が進んでいます",
+      [{ color: "--s1", label: "世帯数" }, { color: "--s2", label: "人口" }],
+      lineChart({
+        labels: census.map(function (y) { return y + "年"; }),
+        xTicks: census.map(function (y, i) { return { i: i, label: y }; })
+          .filter(function (t, i) { return i % 2 === 0; }),
+        series: [
+          { label: "世帯数", color: "--s1",
+            values: hhC.map(function (v) { return has(v) && baseH ? v / baseH * 100 : null; }) },
+          { label: "人口", color: "--s2",
+            values: popC.map(function (v) { return has(v) && base ? v / base * 100 : null; }) }
+        ],
+        dots: true, fmtTip: function (v) { return v.toFixed(1); },
+        fmtY: function (v) { return v.toFixed(0); }, ratio: 0.5, aria: "人口と世帯の指数"
+      })));
+    cols.appendChild(figure("年齢3区分の構成比", "2020年までが実績、2030年以降が推計",
+      [{ color: "--ord-1", label: "15歳未満", shape: "sq" },
+       { color: "--ord-2", label: "15〜64歳", shape: "sq" },
+       { color: "--ord-3", label: "65歳以上", shape: "sq" }],
+      ageChart(sr.age)));
+    panel.appendChild(cols);
+
+    if (has(a.social)) {
+      panel.appendChild(tiles([
+        { label: "転入超過（" + a.socialYear + "年）", value: signed(a.social), unit: "人",
+          sub: "転入から転出を引いた数。プラスは人が入っている" },
+        { label: "自然増減（" + a.socialYear + "年）", value: signed(a.natural), unit: "人",
+          sub: "出生から死亡を引いた数" },
+        { label: "転入超過／世帯1,000", value: fixed(a.socialPer1k, 2), unit: "人",
+          sub: "規模のちがう地域どうしを比べるための値" }
+      ]));
+    }
+  }
+
+  function tabKakei(panel) {
+    var a = currentArea();
+    var t = a.level === "city" ? parentPref() : a;
+    panel.appendChild(headline((t.level === "national" ? "全国" : t.name) + "の家計",
+      "二人以上の世帯の1か月あたりの支出です。家計調査は都道府県単位の公表で、市区町村別の数字はありません。"));
+
+    if (a.level === "city") {
+      panel.appendChild(notice("<b>家計調査に市区町村別の公表はありません。</b>" +
+        a.name + "を含む<b>" + t.name + "</b>の数字を表示しています。" +
+        "調査地点は県庁所在市が中心のため、県内の郡部では実際の水準が異なります。"));
+    }
+
+    var share = has(t.spendHousing) && has(t.spend) ? t.spendHousing / t.spend * 100 : null;
+    panel.appendChild(tiles([
+      { label: "消費支出", value: num(t.spend), unit: "円/月",
+        sub: t.spendYear + "年・二人以上の世帯" },
+      { label: "うち住居費", value: num(t.spendHousing), unit: "円/月",
+        sub: has(share) ? "家計の " + fixed(share) + "％。ローン返済は含みません" : "" },
+      { label: "家具・家事用品", value: num(t.spendFurniture), unit: "円/月",
+        sub: "リフォームや家具の購買力を見る目安" },
+      { label: "光熱・水道", value: num(t.spendUtility), unit: "円/月",
+        sub: "断熱の提案材料になります" },
+      { label: "貯蓄", value: num(has(t.savings) ? t.savings / 10 : null), unit: "万円",
+        sub: "1世帯あたり平均" },
+      { label: "住宅・土地のための負債", value: num(has(t.debtHousing) ? t.debtHousing / 10 : null),
+        unit: "万円", sub: "住宅ローン残高にあたる部分" }
+    ]));
+
+    var sr = SERIES[t.code] || {};
+    var cols = el("div", "cols");
+    if (sr.mix && sr.mix.length) {
+      var rows = META.spendKeys.map(function (k, i) {
+        return { label: SPEND_NAMES[k], value: sr.mix[i],
+          color: k === "housing" ? "--s2" : "--ord-2",
+          tip: tipRow(k === "housing" ? "--s2" : "--ord-2", "月額", num(sr.mix[i]) + "円") +
+            tipRow(null, "構成比", fixed(sr.mix[i] / t.spend * 100) + "%") };
+      }).filter(function (r) { return has(r.value); })
+        .sort(function (x, y) { return y.value - x.value; });
+      cols.appendChild(figure("費目別の月額支出",
+        "家計調査 " + t.spendYear + "年／1世帯あたり。住居費だけ色を変えています", null,
+        rankedBars(rows, { rowH: 26, leftPad: 106, fmtValue: function (v) { return num(v); },
+          aria: "費目別の支出" })));
+    }
+    if (sr.sp) {
+      cols.appendChild(figure("消費支出と住居費の推移",
+        "家計調査／1世帯あたり月額。住居費は見やすさのため10倍にして重ねています",
+        [{ color: "--s1", label: "消費支出" }, { color: "--s2", label: "住居費（10倍）" }],
+        lineChart({
+          labels: META.spendYears.map(function (y) { return y + "年"; }),
+          xTicks: yearTicks(META.spendYears, 5),
+          series: [{ label: "消費支出", color: "--s1", values: sr.sp },
+                   { label: "住居費（10倍）", color: "--s2",
+                     values: (sr.sph || []).map(function (v) { return has(v) ? v * 10 : null; }) }],
+          unit: "円", fmtTip: function (v) { return num(v); },
+          fmtY: function (v) { return num(v / 10000, 1) + "万"; },
+          ratio: 0.5, leftPad: 56, aria: "消費支出と住居費の推移"
+        })));
+    }
+    panel.appendChild(cols);
+
+    var bars = PREFS.filter(function (p) { return has(p.spend); })
+      .sort(function (x, y) { return y.spend - x.spend; })
+      .map(function (p) {
+        return { label: p.name, value: p.spend, current: p.code === t.code,
+          color: p.code === t.code ? "--s1" : "--ord-2",
+          tip: tipRow(null, "消費支出", num(p.spend) + "円") +
+            tipRow(null, "うち住居費", num(p.spendHousing) + "円") +
+            tipRow(null, "住居費の割合", fixed(p.spendHousing / p.spend * 100) + "%") };
+      });
+    panel.appendChild(figure("都道府県別の消費支出（月額）",
+      "家計調査 " + NATIONAL.spendYear + "年。選んでいる地域を色付きで示しています", null,
+      rankedBars(bars, { rowH: 21, leftPad: 76, axis: true,
+        fmtValue: function (v) { return num(v); },
+        fmtAxis: function (v) { return num(v / 10000, 0) + "万"; },
+        aria: "都道府県別の消費支出" })));
+  }
+
+  function tabWork(panel) {
+    var a = currentArea();
+    var t = a.level === "city" ? parentPref() : a;
+    panel.appendChild(headline((t.level === "national" ? "全国" : t.name) + "の働く人の環境",
+      "採用の条件づくりに使う数字です。賃金は都道府県単位の公表で、市区町村別の数字はありません。"));
+
+    if (a.level === "city") {
+      panel.appendChild(notice("<b>賃金・求人に市区町村別の公表はありません。</b>" +
+        a.name + "を含む<b>" + t.name + "</b>の数字を表示しています。"));
+    }
+
+    panel.appendChild(tiles([
+      { label: "所定内給与（男）", value: num(t.wageM, 1), unit: "千円/月",
+        sub: t.wageYear + "年／女性は " + num(t.wageF, 1) + "千円" },
+      { label: "大卒初任給（男）", value: num(t.gradUni, 1), unit: "千円/月",
+        sub: "高卒（男）は " + num(t.gradHigh, 1) + "千円" },
+      { label: "最低賃金", value: num(t.minWage), unit: "円/時",
+        sub: t.level === "national" ? "全国加重平均" : "全国は " + num(NATIONAL.minWage) + "円" },
+      { label: "有効求人倍率", value: fixed(t.jobRatio, 2), unit: "倍",
+        sub: t.jobYear + "年／1倍を超えると求人が求職を上回る" }
+    ]));
+
+    if (has(t.primary)) {
+      var tot = t.primary + t.secondary + t.tertiary;
+      panel.appendChild(figure("産業3区分の就業者数（2020年国勢調査）",
+        "建設業は第2次産業に含まれます", null,
+        rankedBars([
+          { label: "第1次産業", value: t.primary, color: "--ord-1",
+            tip: tipRow(null, "構成比", fixed(t.primary / tot * 100) + "%") },
+          { label: "第2次産業", value: t.secondary, color: "--ord-2",
+            tip: tipRow(null, "構成比", fixed(t.secondary / tot * 100) + "%") },
+          { label: "第3次産業", value: t.tertiary, color: "--ord-3",
+            tip: tipRow(null, "構成比", fixed(t.tertiary / tot * 100) + "%") }
+        ], { rowH: 32, leftPad: 90, fmtValue: function (v) { return man(v) + "万人"; },
+          aria: "産業別の就業者数" })));
+    }
+
+    var bars = PREFS.filter(function (p) { return has(p.wageM); })
+      .sort(function (x, y) { return y.wageM - x.wageM; })
+      .map(function (p) {
+        return { label: p.name, value: p.wageM, current: p.code === t.code,
+          color: p.code === t.code ? "--s1" : "--ord-2",
+          tip: tipRow(null, "所定内給与（男）", num(p.wageM, 1) + "千円") +
+            tipRow(null, "大卒初任給", num(p.gradUni, 1) + "千円") +
+            tipRow(null, "最低賃金", num(p.minWage) + "円") };
+      });
+    panel.appendChild(figure("都道府県別の所定内給与（男・月額）",
+      NATIONAL.wageYear + "年／賃金構造基本統計調査。選んでいる地域を色付きで示しています", null,
+      rankedBars(bars, { rowH: 21, leftPad: 76, axis: true,
+        fmtValue: function (v) { return num(v, 1); },
+        fmtAxis: function (v) { return num(v, 0); }, aria: "都道府県別の給与" })));
+  }
+
+  // ---------- ランキング ----------
+  var RANK_METRICS = [
+    { key: "startsChg", name: "着工の前年比", fmt: function (v) { return pct(v); }, desc: true, signed: true },
+    { key: "starts", name: "着工の戸数", fmt: function (v) { return num(v); }, desc: true },
+    { key: "startsPer1k", name: "着工／世帯1,000", fmt: function (v) { return fixed(v, 2); }, desc: true },
+    { key: "score", name: "狙い目スコア", fmt: function (v) { return (v > 0 ? "+" : "") + fixed(v, 2); }, desc: true, signed: true },
+    { key: "chg2050", name: "人口 2020→2050", fmt: function (v) { return pct(v); }, desc: true, signed: true },
+    { key: "aging2020", name: "高齢化率（低い順）", fmt: function (v) { return fixed(v) + "%"; }, desc: false },
+    { key: "vacantRate", name: "空き家率（低い順）", fmt: function (v) { return fixed(v) + "%"; }, desc: false },
+    { key: "hhChg", name: "世帯数 2000→2020", fmt: function (v) { return pct(v); }, desc: true, signed: true }
+  ];
+  var rankState = { level: "pref", metric: "startsChg", prefOnly: false };
+
+  function tabRank(panel) {
+    var a = currentArea();
+    panel.appendChild(headline("ランキングと4区分",
+      "指標を選んで並べ替えられます。表の行をクリックすると、その地域に切り替わります。"));
+
+    var ctl = el("div", "controls");
+    var seg = el("div", "seg");
+    [["pref", "都道府県"], ["city", "市区町村"]].forEach(function (o) {
+      var b = el("button", null, o[1]);
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(rankState.level === o[0]));
+      b.addEventListener("click", function () { rankState.level = o[0]; renderTab(); });
+      seg.appendChild(b);
+    });
+    ctl.appendChild(seg);
+
+    var mf = el("div", "field");
+    var ml = el("label", null, "指標");
+    ml.setAttribute("for", "rank-metric");
+    mf.appendChild(ml);
+    var msel = el("select");
+    msel.id = "rank-metric";
+    RANK_METRICS.forEach(function (m) { msel.appendChild(new Option(m.name, m.key)); });
+    msel.value = rankState.metric;
+    msel.addEventListener("change", function () { rankState.metric = msel.value; renderTab(); });
+    mf.appendChild(msel);
+    ctl.appendChild(mf);
+
+    if (rankState.level === "city" && state.pref !== "00000") {
+      var pf = el("div", "field");
+      var pl = el("label", null, "範囲");
+      pl.setAttribute("for", "rank-scope");
+      pf.appendChild(pl);
+      var psel = el("select");
+      psel.id = "rank-scope";
+      psel.appendChild(new Option("全国の市区町村", "all"));
+      psel.appendChild(new Option(BY_CODE[state.pref].name + "の中だけ", "pref"));
+      psel.value = rankState.prefOnly ? "pref" : "all";
+      psel.addEventListener("change", function () {
+        rankState.prefOnly = psel.value === "pref"; renderTab();
+      });
+      pf.appendChild(psel);
+      ctl.appendChild(pf);
+    }
+    panel.appendChild(ctl);
+
+    var metric = RANK_METRICS.filter(function (m) { return m.key === rankState.metric; })[0];
+    var pool = rankState.level === "pref" ? PREFS
+      : (rankState.prefOnly && state.pref !== "00000"
+          ? (CITIES_BY_PREF[state.pref.slice(0, 2)] || []) : CITIES);
+
+    var ranked = pool.filter(function (p) { return has(p[metric.key]); })
+      .sort(function (x, y) {
+        return metric.desc ? y[metric.key] - x[metric.key] : x[metric.key] - y[metric.key];
+      });
+
+    var top = ranked.slice(0, 15).map(function (p) {
+      return { label: (rankState.level === "city" ? p.prefName + " " : "") + p.name,
+        value: p[metric.key], current: p.code === a.code,
+        color: p.code === a.code ? "--s1" : (metric.signed ? null : "--ord-2"),
+        tip: tipRow(null, metric.name, metric.fmt(p[metric.key])) +
+          tipRow(null, "着工", has(p.starts) ? num(p.starts) + "戸" : "公表なし") +
+          tipRow(null, "人口", man(p.pop2020) + "万人") };
+    });
+    panel.appendChild(figure(metric.name + "　上位15",
+      (rankState.level === "pref" ? "47都道府県" : "対象 " + num(ranked.length) + "市区町村") +
+      "／" + (metric.desc ? "大きい順" : "小さい順") + "。選んでいる地域があれば色を変えています",
+      null,
+      rankedBars(top, { rowH: 24, leftPad: rankState.level === "city" ? 150 : 88, axis: true,
+        fmtValue: metric.fmt, fmtAxis: metric.fmt, aria: metric.name + "の上位" })));
+
+    if (rankState.level === "city") {
+      var scat = CITIES.filter(function (c) {
+        return has(c.socialPer1k) && has(c.startsPer1k);
+      });
+      panel.appendChild(figure("需要と供給の4区分（市区町村）",
+        "横軸＝転入超過（世帯1,000あたり）／縦軸＝着工（世帯1,000あたり）。" +
+        "境目は全市区町村の中央値です。選んでいる地域を大きい点で示しています",
+        [{ color: "--s1", label: "選んでいる地域", shape: "dot" },
+         { color: "--ink-muted", label: "その他の市区町村", shape: "dot" }],
+        scatterChart(scat, a.code)));
+    }
+
+    var bar = el("div", "controls");
+    var cnt = el("span", "count");
+    bar.appendChild(cnt);
+    var moreBtn = el("button", "ghost", "さらに60件表示");
+    moreBtn.type = "button";
+    var tw = dataTable(rankState.level === "pref" ? prefCols() : cityCols(), pool.slice(), {
+      sortKey: metric.key, sortDir: metric.desc ? "desc" : "asc",
+      limit: rankState.level === "pref" ? 50 : 60,
+      currentCode: a.code,
+      onPick: function (r) { setArea(r.code); },
+      onRender: function (total, shown) {
+        cnt.textContent = num(total) + "件中 " + num(shown) + "件を表示";
+        moreBtn.hidden = shown >= total;
+      }
+    });
+    moreBtn.addEventListener("click", function () { tw.api.more(60); });
+    panel.appendChild(bar);
+    panel.appendChild(tw);
+    panel.appendChild(moreBtn);
+  }
+
+  function prefCols() {
+    return [
+      { head: "都道府県", key: "name", txt: true, cls: "name txt",
+        render: function (r) { return r.name; } },
+      { head: "着工 戸数", key: "starts", render: function (r) { return num(r.starts) + "戸"; } },
+      { head: "前年比", key: "startsChg", tone: function (r) { return tone(r.startsChg); },
+        render: function (r) { return pct(r.startsChg); } },
+      { head: "うち持家", key: "owner", render: function (r) { return num(r.owner) + "戸"; } },
+      { head: "着工/千世帯", key: "startsPer1k",
+        render: function (r) { return fixed(r.startsPer1k, 2); } },
+      { head: "転入超過", key: "social", tone: function (r) { return tone(r.social); },
+        render: function (r) { return signed(r.social); } },
+      { head: "人口", key: "pop2020", render: function (r) { return man(r.pop2020) + "万"; } },
+      { head: "世帯数", key: "hh2020", render: function (r) { return man(r.hh2020) + "万"; } },
+      { head: "高齢化率", key: "aging2020", render: function (r) { return fixed(r.aging2020) + "%"; } },
+      { head: "2050年人口", key: "chg2050", tone: function (r) { return tone(r.chg2050); },
+        render: function (r) { return pct(r.chg2050); } },
+      { head: "空き家率", key: "vacantRate", render: function (r) { return fixed(r.vacantRate) + "%"; } },
+      { head: "消費支出/月", key: "spend", render: function (r) { return num(r.spend) + "円"; } },
+      { head: "給与（男）", key: "wageM", render: function (r) { return num(r.wageM, 1) + "千円"; } }
+    ];
+  }
+
+  function cityCols() {
+    return [
+      { head: "市区町村", key: "name", txt: true, cls: "name txt",
+        render: function (r) { return r.name; } },
+      { head: "都道府県", key: "prefName", txt: true, cls: "muted txt",
+        render: function (r) { return r.prefName; } },
+      { head: "区分", key: "score", txt: true, cls: "txt", render: function (r) {
+          return r.quadrant ? el("span", "pill " + QCLASS[r.quadrant], r.quadrant) : "—"; } },
+      { head: "狙い目スコア", key: "score", tone: function (r) { return tone(r.score); },
+        render: function (r) {
+          return has(r.score) ? (r.score > 0 ? "+" : "") + fixed(r.score, 2) : "—"; } },
+      { head: "着工 戸数", key: "starts",
+        render: function (r) { return has(r.starts) ? num(r.starts) + "戸" : "公表なし"; } },
+      { head: "前年比", key: "startsChg", tone: function (r) { return tone(r.startsChg); },
+        render: function (r) { return pct(r.startsChg); } },
+      { head: "着工/千世帯", key: "startsPer1k",
+        render: function (r) { return fixed(r.startsPer1k, 2); } },
+      { head: "転入超過/千世帯", key: "socialPer1k",
+        tone: function (r) { return tone(r.socialPer1k); },
+        render: function (r) {
+          return has(r.socialPer1k) ? (r.socialPer1k > 0 ? "+" : "") + fixed(r.socialPer1k, 2) : "—"; } },
+      { head: "人口", key: "pop2020", render: function (r) { return num(r.pop2020); } },
+      { head: "世帯数", key: "hh2020", render: function (r) { return num(r.hh2020); } },
+      { head: "高齢化率", key: "aging2020", render: function (r) { return fixed(r.aging2020) + "%"; } },
+      { head: "2050年人口", key: "chg2050", tone: function (r) { return tone(r.chg2050); },
+        render: function (r) { return pct(r.chg2050); } },
+      { head: "空き家率", key: "vacantRate",
+        render: function (r) { return has(r.vacantRate) ? fixed(r.vacantRate) + "%" : "—"; } }
+    ];
+  }
+
+  function tabAbout(panel) {
+    panel.appendChild(headline("出典と、読むときの注意",
+      "数値はすべて政府統計から機械的に取得したものです。割合とスコアの算出のみこちらで行っています。"));
+    var box = el("div", "sources");
+    [
+      ["着工（年度）", "総務省「社会・人口統計体系」Ｈ 居住",
+       "建築着工統計をまとめた統計。都道府県1975〜2024年度、市区町村2000〜2024年度"],
+      ["着工（月次）", "国土交通省「住宅着工統計 時系列表」",
+       "都道府県別着工戸数。2005年4月〜2024年12月"],
+      ["人口・世帯・年齢・移動", "総務省「社会・人口統計体系」Ａ 人口・世帯",
+       "国勢調査・人口推計・住民基本台帳ベース"],
+      ["将来推計人口", "社人研「日本の地域別将来推計人口」",
+       "令和5(2023)年推計。2020年国勢調査を出発点に2050年まで"],
+      ["家計", "家計調査（二人以上の世帯）ほか",
+       "費目別支出は2000〜2025年、貯蓄・負債は5年ごと"],
+      ["住宅ストック", "住宅・土地統計調査",
+       "総住宅数・空き家数・持ち家数。5年ごと、直近は2023年"],
+      ["働く人", "賃金構造基本統計調査／職業安定業務統計／最低賃金",
+       "給与・初任給は2020〜2024年、就業者数は国勢調査"]
+    ].forEach(function (r) {
+      var d = el("div", "source");
+      d.appendChild(el("span", "k", r[0]));
+      var v = el("span", "v");
+      v.appendChild(document.createTextNode(r[1]));
+      v.appendChild(el("span", null, r[2]));
+      d.appendChild(v);
+      box.appendChild(d);
+    });
+    panel.appendChild(box);
+
+    var m = el("div", "method");
+    m.appendChild(el("span", "k", "狙い目スコアの作り方"));
+    m.appendChild(el("code", null, "スコア ＝ 転入超過（世帯1,000あたり）− 着工戸数（世帯1,000あたり）"));
+    m.appendChild(el("p", null,
+      "人の流入に対して住宅の供給が追いついていないほど、スコアは大きくなります。" +
+      "公的な統計値ではなく、需要と供給の差を見るためにこちらで作った目安です。" +
+      "4区分の境目は、着工が公表されている" + num(META.cityWithStarts) + "市区町村の中央値です。"));
+    panel.appendChild(m);
+
+    var ul = el("ul", "caveats");
+    [
+      "<b>着工の数字は2024年（2024年度）が最新です。</b>e-Stat で公開されている住宅着工統計は、月次が2024年12月まで、年度次が2024年度までです。",
+      "<b>住居費に住宅ローンの返済は入っていません。</b>家計調査の「住居」は家賃と修繕費が中心です。持ち家世帯の実際の負担は、この金額より大きくなります。",
+      "<b>家計調査と賃金は都道府県単位です。</b>市区町村別の公表がないため、市区町村を選んだときは県の数字を表示しています。",
+      "<b>市区町村別の着工は「市」と「区」のみの公表です。</b>町村分は公表されていないため、着工のある市区町村は" +
+        num(META.cityWithStarts) + "件です。人口・世帯は" + num(META.cityTotal) + "件すべて取得しています。",
+      "<b>市区町村の数値は「廃置分合処理済」の統計です。</b>平成の大合併などを現在の区域にそろえて過去の数値を組み替えた版で、合併による見かけ上の増減が入りません。",
+      "<b>福島県の13市町村は個別の将来推計値がありません。</b>社人研の推計で「浜通り地域」として一括して扱われているためです。",
+      "<b>国勢調査ベースの数値は2020年が最新です。</b>2025年調査の結果は、今回使った統計表にはまだ反映されていません。"
+    ].forEach(function (t) {
+      var li = el("li");
+      li.innerHTML = t;
+      ul.appendChild(li);
+    });
+    panel.appendChild(ul);
+    panel.appendChild(el("p", "foot",
+      "作成：SUMUS コンサル事業部／データ取得日 2026年9月。e-Stat API および社人研の公表資料から取得。"));
+  }
+
+  // ---------- 起動 ----------
+  document.getElementById("meta").textContent =
+    "着工 " + NATIONAL.startsYear + "年度（月次 " +
+    ymLabel(META.months[META.months.length - 1]) + "まで）／家計 " +
+    NATIONAL.spendYear + "年／給与 " + NATIONAL.wageYear + "年／人口 2020年＋2050年推計";
+
+  restore();
+  buildPrefSelect();
+  buildCitySelect();
+  updateCrumb();
+  buildTabs();
+  renderTab();
+
+  document.getElementById("sel-pref").addEventListener("change", function (e) {
+    state.pref = e.target.value;
+    state.city = "";
+    save(); buildCitySelect(); updateCrumb(); renderTab();
+  });
+  document.getElementById("sel-city").addEventListener("change", function (e) {
+    state.city = e.target.value;
+    save(); updateCrumb(); renderTab();
+  });
+  document.getElementById("btn-reset").addEventListener("click", function () {
+    state.pref = "00000"; state.city = "";
+    save(); buildPrefSelect(); buildCitySelect(); updateCrumb(); renderTab();
+  });
 
   var timer = null, lastW = window.innerWidth;
   window.addEventListener("resize", function () {
     if (Math.abs(window.innerWidth - lastW) < 24) return;
     lastW = window.innerWidth;
     clearTimeout(timer);
-    timer = setTimeout(renderCharts, 180);
+    timer = setTimeout(redrawCharts, 180);
   });
   var mq = window.matchMedia("(prefers-color-scheme: dark)");
-  if (mq.addEventListener) mq.addEventListener("change", renderCharts);
-  new MutationObserver(renderCharts).observe(document.documentElement,
+  if (mq.addEventListener) mq.addEventListener("change", redrawCharts);
+  new MutationObserver(redrawCharts).observe(document.documentElement,
     { attributes: true, attributeFilter: ["data-theme"] });
 })();
 </script>

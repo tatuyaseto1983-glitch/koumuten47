@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""ダッシュボード（HTML）に埋め込むJSONを作る。数値はすべて取得済みCSVから拾う。
+"""アプリに埋め込むJSONを作る。地域（全国・都道府県・市区町村）ごとに
+時系列と要約値をまとめ、画面側で切り替えられる形にする。
 
   python3 scripts/build_report_data.py
 """
@@ -14,30 +15,29 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "data" / "processed"
 
-CENSUS = ["1980", "1985", "1990", "1995", "2000", "2005", "2010", "2015", "2020"]
-PROJ = ["2025", "2030", "2035", "2040", "2045", "2050"]
+CENSUS = [1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020]
+PROJ = [2020, 2025, 2030, 2035, 2040, 2045, 2050]
+AGE_PROJ = [2030, 2040, 2050]
 
 # 社会・人口統計体系の項目コード
 POP, HH, HH_MEMBER, HH_ALONE = "A1101", "A710101", "A710201", "A810105"
-AGE = {"young": "A1301", "work": "A1302", "old": "A1303", "oldRate": "A1306"}
+AGE_Y, AGE_W, AGE_O, AGE_RATE = "A1301", "A1302", "A1303", "A1306"
 IN_MIG, OUT_MIG, BIRTH, DEATH = "A5103", "A5104", "A4101", "A4200"
-STARTS = {"total": "H1800", "owner": "H1801", "rent": "H1802", "sale": "H1803",
-          "company": "H1804", "buildings": "H1700", "floor": "H2500"}
-STOCK = {"total": "H1100", "vacant": "H110202", "owned": "H1310", "rented": "H1320",
-         "detached": "H1401", "apartment": "H1403", "areaOwned": "H213010"}
-SPEND = {"total": "L3221", "food": "L322101", "housing": "L322102", "utility": "L322103",
-         "furniture": "L322104", "clothing": "L322105", "health": "L322106",
-         "transport": "L322107", "education": "L322108", "leisure": "L322109",
-         "other": "L322110"}
-ASSETS = {"savings": "L730101", "debtHousing": "L740102",
-          "savingsOld": "L430101", "debtOld": "L440101", "debtHousingOld": "L440102"}
-LABOUR = {"workers": "F1102", "primary": "F2201", "secondary": "F2211", "tertiary": "F2221",
-          "jobRatio": "F310301", "wageM": "F620217", "wageF": "F620218",
-          "gradUniM": "F6411", "gradUniF": "F6412", "gradHighM": "F6407",
-          "minWage": "F6501"}
-# 月次の利用関係コード
-MONTHLY = {"total": "11", "owner": "12", "rent": "13", "company": "14",
-           "sale": "15", "mansion": "16", "detached": "17"}
+ST_TOTAL, ST_OWNER, ST_RENT, ST_SALE = "H1800", "H1801", "H1802", "H1803"
+STOCK_TOTAL, STOCK_VACANT, STOCK_OWNED = "H1100", "H110202", "H1310"
+SP_TOTAL, SP_HOUSING = "L3221", "L322102"
+SPEND_ITEMS = {
+    "food": "L322101", "housing": "L322102", "utility": "L322103",
+    "furniture": "L322104", "clothing": "L322105", "health": "L322106",
+    "transport": "L322107", "education": "L322108", "leisure": "L322109",
+    "other": "L322110",
+}
+SAVINGS, DEBT_HOUSING = "L730101", "L740102"
+WAGE_M, WAGE_F, GRAD_UNI, GRAD_HIGH = "F620217", "F620218", "F6411", "F6407"
+MIN_WAGE, JOB_RATIO = "F6501", "F310301"
+IND = {"primary": "F2201", "secondary": "F2211", "tertiary": "F2221"}
+MONTHLY_CAT = {"total": "11", "owner": "12", "rent": "13", "sale": "15",
+               "mansion": "16", "detached": "17"}
 
 
 def load(name: str) -> list[dict]:
@@ -50,17 +50,6 @@ def load(name: str) -> list[dict]:
 
 def code_of(cat_code: str) -> str:
     return cat_code.split("|")[-1]
-
-
-def index(rows: list[dict]) -> tuple[dict, dict]:
-    values: dict[tuple[str, str, str], float] = {}
-    names: dict[str, dict[str, str]] = {}
-    for r in rows:
-        names.setdefault(r["area_code"], {"name": r["area_name"], "pref": r["pref_name"]})
-        if r["value"] == "":
-            continue
-        values[(r["area_code"], r["year"], code_of(r["cat_code"]))] = float(r["value"])
-    return values, names
 
 
 def rnd(v, n=1):
@@ -79,371 +68,361 @@ def per(a, b, scale=1000.0):
     return a / b * scale
 
 
-def latest_with(values: dict, area: str, code: str, years: list[str]) -> str | None:
-    for y in reversed(years):
-        if (area, y, code) in values:
-            return y
-    return None
-
-
-def ym_of(time_code: str) -> tuple[int, int] | None:
-    """月次の時間軸コード（例 2024001212）から年と月を取り出す。"""
+def ym_of(time_code: str):
     m = re.match(r"^(\d{4})00(\d{2})", str(time_code))
-    if not m:
-        return None
-    return int(m.group(1)), int(m.group(2))
+    return (int(m.group(1)), int(m.group(2))) if m else None
 
 
-# ---------------------------------------------------------------------------
-def build_monthly() -> tuple[list[dict], list[dict], dict]:
-    rows = load("housing_starts_monthly_pref")
-    series: dict[tuple[int, int], dict[str, float]] = defaultdict(dict)
-    pref_year: dict[tuple[str, int], dict[str, float]] = defaultdict(lambda: defaultdict(float))
-    inv = {v: k for k, v in MONTHLY.items()}
-    for r in rows:
-        if r["value"] == "":
-            continue
-        ym = ym_of(r["time_code"])
-        if not ym:
-            continue
-        key = inv.get(code_of(r["cat_code"]))
-        if not key:
-            continue
-        v = float(r["value"])
-        if r["area_code"] == "00000":
-            series[ym][key] = v
-        pref_year[(r["area_code"], ym[0])][key] += v
+class Store:
+    """{地域, 年, 項目} → 値 を引ける入れ物。"""
 
-    monthly = [{"y": ym[0], "m": ym[1], **vals} for ym, vals in sorted(series.items())]
-    # 通年でそろっている年だけを年次系列にする
-    counts: dict[int, int] = defaultdict(int)
-    for ym in series:
-        counts[ym[0]] += 1
-    full_years = sorted(y for y, c in counts.items() if c == 12)
-    annual = []
-    for y in full_years:
-        agg = defaultdict(float)
-        for ym, vals in series.items():
-            if ym[0] != y:
+    def __init__(self):
+        self.v: dict[tuple[str, int, str], float] = {}
+        self.names: dict[str, dict] = {}
+
+    def add(self, rows: list[dict]):
+        for r in rows:
+            self.names.setdefault(r["area_code"],
+                                  {"name": r["area_name"], "pref": r["pref_name"]})
+            if r["value"] == "" or not r["year"]:
                 continue
-            for k, v in vals.items():
-                agg[k] += v
-        annual.append({"year": y, **{k: round(v) for k, v in agg.items()}})
-    return monthly, annual, pref_year
+            self.v[(r["area_code"], int(r["year"]), code_of(r["cat_code"]))] = float(r["value"])
+
+    def get(self, area, year, code):
+        return self.v.get((area, year, code))
+
+    def series(self, area, code, years):
+        return [self.get(area, y, code) for y in years]
+
+    def latest(self, area, code, years):
+        for y in reversed(years):
+            val = self.get(area, y, code)
+            if val is not None:
+                return y, val
+        return None, None
 
 
-def build_pref() -> tuple[list[dict], dict, dict]:
-    starts = load("housing_starts_pref")
-    stock = load("housing_stock_pref")
-    spend = load("consumption_pref")
-    labour = load("labour_pref")
-    pop = load("population_pref")
-    hh = load("households_pref")
-    mig = load("migration_pref")
-    age = load("age_structure_pref")
-
-    all_rows = starts + stock + spend + labour + pop + hh + mig + age
-    values, names = index(all_rows)
-    years = sorted({r["year"] for r in all_rows})
-
-    fut = {}
-    for r in load("future_population_pref"):
-        if r["value"]:
-            fut[(r["area_code"], r["year"], r["cat_name"])] = float(r["value"])
-
+def clean(seq):
+    """JSONを軽くするため、整数になる値は整数にする。"""
     out = []
-    for area in sorted(names):
-        g = lambda y, c: values.get((area, y, c))
-        sy = latest_with(values, area, STARTS["total"], years)
-        prev = str(int(sy) - 1) if sy else None
-        hh_now = g("2020", HH)
-        stock_year = latest_with(values, area, STOCK["total"], years)
-        spend_year = latest_with(values, area, SPEND["total"], years)
-        wage_year = latest_with(values, area, LABOUR["wageM"], years)
-        job_year = latest_with(values, area, LABOUR["jobRatio"], years)
-        mig_year = latest_with(values, area, IN_MIG, years)
-        social = None
-        if mig_year and g(mig_year, IN_MIG) is not None and g(mig_year, OUT_MIG) is not None:
-            social = g(mig_year, IN_MIG) - g(mig_year, OUT_MIG)
-        nat_year = latest_with(values, area, BIRTH, years)
-        natural = None
-        if nat_year and g(nat_year, BIRTH) is not None and g(nat_year, DEATH) is not None:
-            natural = g(nat_year, BIRTH) - g(nat_year, DEATH)
-
-        row = {
-            "code": area,
-            "name": names[area]["name"],
-            # --- 着工
-            "startsYear": sy,
-            "starts": g(sy, STARTS["total"]) if sy else None,
-            "startsPrev": g(prev, STARTS["total"]) if prev else None,
-            "owner": g(sy, STARTS["owner"]) if sy else None,
-            "ownerPrev": g(prev, STARTS["owner"]) if prev else None,
-            "rent": g(sy, STARTS["rent"]) if sy else None,
-            "sale": g(sy, STARTS["sale"]) if sy else None,
-            "buildings": g(sy, STARTS["buildings"]) if sy else None,
-            # --- 住宅ストック
-            "stockYear": stock_year,
-            "stockTotal": g(stock_year, STOCK["total"]) if stock_year else None,
-            "vacant": g(stock_year, STOCK["vacant"]) if stock_year else None,
-            "owned": g(stock_year, STOCK["owned"]) if stock_year else None,
-            "rented": g(stock_year, STOCK["rented"]) if stock_year else None,
-            "areaOwned": g(stock_year, STOCK["areaOwned"]) if stock_year else None,
-            # --- 家計
-            "spendYear": spend_year,
-            "spend": g(spend_year, SPEND["total"]) if spend_year else None,
-            "spendHousing": g(spend_year, SPEND["housing"]) if spend_year else None,
-            "spendFurniture": g(spend_year, SPEND["furniture"]) if spend_year else None,
-            "spendUtility": g(spend_year, SPEND["utility"]) if spend_year else None,
-            "savings": g(latest_with(values, area, ASSETS["savings"], years), ASSETS["savings"]),
-            "debtHousing": g(latest_with(values, area, ASSETS["debtHousing"], years),
-                             ASSETS["debtHousing"]),
-            # --- 働く人
-            "wageYear": wage_year,
-            "wageM": g(wage_year, LABOUR["wageM"]) if wage_year else None,
-            "wageF": g(wage_year, LABOUR["wageF"]) if wage_year else None,
-            "gradUniM": g(wage_year, LABOUR["gradUniM"]) if wage_year else None,
-            "gradHighM": g(wage_year, LABOUR["gradHighM"]) if wage_year else None,
-            "minWage": g(latest_with(values, area, LABOUR["minWage"], years), LABOUR["minWage"]),
-            "jobRatio": g(job_year, LABOUR["jobRatio"]) if job_year else None,
-            "jobYear": job_year,
-            "primary": g("2020", LABOUR["primary"]),
-            "secondary": g("2020", LABOUR["secondary"]),
-            "tertiary": g("2020", LABOUR["tertiary"]),
-            # --- 人口・世帯
-            "pop2020": g("2020", POP),
-            "pop2000": g("2000", POP),
-            "hh2020": hh_now,
-            "hh2000": g("2000", HH),
-            "size2020": rnd(per(g("2020", HH_MEMBER), hh_now, 1), 2),
-            "single2020": rnd(per(g("2020", HH_ALONE), hh_now, 100)),
-            "aging2020": rnd(g("2020", AGE["oldRate"])),
-            "social": social,
-            "socialYear": mig_year,
-            "natural": natural,
-            "pop2050": fut.get((area, "2050", "総人口")),
-            "old2050": fut.get((area, "2050", "65歳以上人口")),
-        }
-        row["startsChg"] = rnd(chg(row["starts"], row["startsPrev"]))
-        row["ownerChg"] = rnd(chg(row["owner"], row["ownerPrev"]))
-        row["startsPer1k"] = rnd(per(row["starts"], hh_now), 2)
-        row["socialPer1k"] = rnd(per(social, hh_now), 2)
-        row["vacantRate"] = rnd(per(row["vacant"], row["stockTotal"], 100))
-        row["ownedRate"] = rnd(per(row["owned"], row["stockTotal"], 100))
-        row["chg2050"] = rnd(chg(row["pop2050"], row["pop2020"]))
-        row["aging2050"] = rnd(per(row["old2050"], row["pop2050"], 100))
-        row["hhChg"] = rnd(chg(hh_now, row["hh2000"]))
-        row["popChg"] = rnd(chg(row["pop2020"], row["pop2000"]))
-        out.append(row)
-
-    # 全国の費目別支出と長期推移
-    nat = "00000"
-    spend_year = latest_with(values, nat, SPEND["total"], years)
-    breakdown = [{"key": k, "value": values.get((nat, spend_year, c))}
-                 for k, c in SPEND.items() if k != "total"]
-    spend_series = []
-    for y in sorted({r["year"] for r in spend}):
-        t = values.get((nat, y, SPEND["total"]))
-        h = values.get((nat, y, SPEND["housing"]))
-        if t:
-            spend_series.append({"year": int(y), "total": t, "housing": h})
-
-    indexed = []
-    base_pop = values.get((nat, "1980", POP))
-    base_hh = values.get((nat, "1980", HH))
-    for y in CENSUS:
-        p, h = values.get((nat, y, POP)), values.get((nat, y, HH))
-        if p and h:
-            indexed.append({"year": int(y), "pop": round(p / base_pop * 100, 1),
-                            "hh": round(h / base_hh * 100, 1), "popRaw": p, "hhRaw": h,
-                            "size": round(values.get((nat, y, HH_MEMBER), 0) / h, 2)})
-
-    age_mix = []
-    for y in CENSUS:
-        tri = [values.get((nat, y, AGE[k])) for k in ("young", "work", "old")]
-        if all(tri):
-            tot = sum(tri)
-            age_mix.append({"year": int(y), "kind": "実績",
-                            "young": round(tri[0] / tot * 100, 1),
-                            "work": round(tri[1] / tot * 100, 1),
-                            "old": round(tri[2] / tot * 100, 1)})
-    pref_codes = sorted({r["area_code"] for r in load("future_population_pref")})
-
-    def fut_sum(year, item):
-        vals = [fut.get((c, year, item)) for c in pref_codes]
-        return sum(v for v in vals if v is not None) if all(v is not None for v in vals) else None
-
-    for y in ["2030", "2040", "2050"]:
-        tri = [fut_sum(y, i) for i in ("0～14歳人口", "15～64歳人口", "65歳以上人口")]
-        if all(tri):
-            tot = sum(tri)
-            age_mix.append({"year": int(y), "kind": "推計",
-                            "young": round(tri[0] / tot * 100, 1),
-                            "work": round(tri[1] / tot * 100, 1),
-                            "old": round(tri[2] / tot * 100, 1)})
-
-    starts_series = []
-    for y in sorted({r["year"] for r in starts}):
-        t = values.get((nat, y, STARTS["total"]))
-        if t:
-            starts_series.append({"year": int(y), "total": t,
-                                  "owner": values.get((nat, y, STARTS["owner"])),
-                                  "rent": values.get((nat, y, STARTS["rent"])),
-                                  "sale": values.get((nat, y, STARTS["sale"]))})
-
-    extras = {
-        "spendBreakdown": breakdown,
-        "spendBreakdownYear": spend_year,
-        "spendSeries": spend_series,
-        "indexed": indexed,
-        "ageMix": age_mix,
-        "startsSeries": starts_series,
-        "futureNational": [{"year": int(y), "value": fut_sum(y, "総人口")}
-                           for y in ["2020"] + PROJ if fut_sum(y, "総人口")],
-    }
-    return out, extras, fut
-
-
-def build_city() -> list[dict]:
-    starts = load("housing_starts_city")
-    hh = load("households_city")
-    pop = load("population_city")
-    mig = load("migration_city")
-    stock = load("housing_stock_city")
-    values, names = index(starts + hh + pop + mig + stock)
-    years = sorted({r["year"] for r in starts + hh + pop + mig + stock})
-
-    fut = {}
-    for r in load("future_population_city"):
-        if r["value"]:
-            fut[(r["area_code"], r["year"], r["cat_name"])] = float(r["value"])
-
-    out = []
-    for area in sorted(names):
-        g = lambda y, c: values.get((area, y, c))
-        sy = latest_with(values, area, STARTS["total"], years)
-        if not sy:
-            continue  # 着工の公表がない町村は対象外
-        prev = str(int(sy) - 1)
-        hh_now = g("2020", HH)
-        mig_year = latest_with(values, area, IN_MIG, years)
-        social = None
-        if mig_year and g(mig_year, IN_MIG) is not None and g(mig_year, OUT_MIG) is not None:
-            social = g(mig_year, IN_MIG) - g(mig_year, OUT_MIG)
-        stock_year = latest_with(values, area, STOCK["total"], years)
-        row = {
-            "code": area,
-            "name": names[area]["name"],
-            "pref": names[area]["pref"],
-            "startsYear": sy,
-            "starts": g(sy, STARTS["total"]),
-            "startsPrev": g(prev, STARTS["total"]),
-            "owner": g(sy, STARTS["owner"]),
-            "hh2020": hh_now,
-            "pop2020": g("2020", POP),
-            "social": social,
-            "socialYear": mig_year,
-            "vacant": g(stock_year, STOCK["vacant"]) if stock_year else None,
-            "stockTotal": g(stock_year, STOCK["total"]) if stock_year else None,
-            "pop2050": fut.get((area, "2050", "総人口")),
-        }
-        row["startsChg"] = rnd(chg(row["starts"], row["startsPrev"]))
-        row["startsPer1k"] = rnd(per(row["starts"], hh_now), 2)
-        row["socialPer1k"] = rnd(per(social, hh_now), 2)
-        row["ownerShare"] = rnd(per(row["owner"], row["starts"], 100))
-        row["vacantRate"] = rnd(per(row["vacant"], row["stockTotal"], 100))
-        row["chg2050"] = rnd(chg(row["pop2050"], row["pop2020"]))
-        # 狙い目スコア = 需要（転入超過）− 供給（着工）。どちらも世帯千あたりに直して比べる
-        if row["socialPer1k"] is not None and row["startsPer1k"] is not None:
-            row["score"] = rnd(row["socialPer1k"] - row["startsPer1k"], 2)
+    for v in seq:
+        if v is None:
+            out.append(None)
+        elif abs(v - round(v)) < 1e-9:
+            out.append(int(round(v)))
         else:
-            row["score"] = None
-        out.append(row)
+            out.append(round(v, 2))
     return out
 
 
-def quadrant(demand, supply, dmid, smid):
-    if demand is None or supply is None:
-        return None
-    if demand >= dmid and supply < smid:
-        return "狙い目"
-    if demand >= dmid and supply >= smid:
-        return "過熱気味"
-    if demand < dmid and supply >= smid:
-        return "供給過剰の芽"
-    return "冷え込み"
-
-
-def median(xs):
-    xs = sorted(x for x in xs if x is not None)
-    if not xs:
-        return None
-    n = len(xs)
-    return xs[n // 2] if n % 2 else (xs[n // 2 - 1] + xs[n // 2]) / 2
-
-
 def main() -> None:
-    monthly, annual_types, _ = build_monthly()
-    prefs, extras, _ = build_pref()
-    cities = build_city()
+    # ---- 都道府県（全国を含む）
+    pref_store = Store()
+    for name in ["housing_starts_pref", "housing_stock_pref", "consumption_pref",
+                 "labour_pref", "population_pref", "households_pref",
+                 "migration_pref", "age_structure_pref"]:
+        pref_store.add(load(name))
 
-    national = next(p for p in prefs if p["code"] == "00000")
-    prefs = [p for p in prefs if p["code"] != "00000"]
+    pop_years = list(range(1975, 2025))
+    starts_years = list(range(1975, 2025))
+    spend_years = list(range(2000, 2026))
 
-    # 社人研の表に全国計の行がないため、47都道府県の合計で補う
-    pop2050 = [p["pop2050"] for p in prefs if p["pop2050"] is not None]
-    old2050 = [p["old2050"] for p in prefs if p["old2050"] is not None]
-    if len(pop2050) == 47:
-        national["pop2050"] = sum(pop2050)
-        national["chg2050"] = rnd(chg(national["pop2050"], national["pop2020"]))
-        if len(old2050) == 47:
-            national["aging2050"] = rnd(per(sum(old2050), national["pop2050"], 100))
+    # ---- 市区町村
+    city_store = Store()
+    for name in ["housing_starts_city", "housing_stock_city", "population_city",
+                 "households_city", "migration_city", "age_structure_city"]:
+        city_store.add(load(name))
+    city_starts_years = list(range(2000, 2025))
 
-    dmid = median([c["socialPer1k"] for c in cities])
-    smid = median([c["startsPer1k"] for c in cities])
-    for c in cities:
-        c["quadrant"] = quadrant(c["socialPer1k"], c["startsPer1k"], dmid, smid)
-    for p in prefs:
-        p["quadrant"] = quadrant(p["socialPer1k"], p["startsPer1k"], dmid, smid)
+    # ---- 将来推計
+    fut: dict[tuple[str, int, str], float] = {}
+    for name in ["future_population_pref", "future_population_city"]:
+        for r in load(name):
+            if r["value"]:
+                fut[(r["area_code"], int(r["year"]), r["cat_name"])] = float(r["value"])
 
-    scored = [c for c in cities if c["score"] is not None and c["hh2020"] and c["hh2020"] >= 10000]
-    scored.sort(key=lambda x: -x["score"])
+    pref_codes = sorted({k[0] for k in fut if len(k[0]) == 5 and k[0].endswith("000")})
+
+    def fut_national(year, item):
+        vals = [fut.get((c, year, item)) for c in pref_codes]
+        return sum(v for v in vals if v is not None) if all(v is not None for v in vals) else None
+
+    # ---- 月次の着工
+    monthly_raw = defaultdict(lambda: defaultdict(dict))
+    inv = {v: k for k, v in MONTHLY_CAT.items()}
+    months_set = set()
+    for r in load("housing_starts_monthly_pref"):
+        if r["value"] == "":
+            continue
+        ym = ym_of(r["time_code"])
+        key = inv.get(code_of(r["cat_code"]))
+        if not ym or not key:
+            continue
+        months_set.add(ym)
+        monthly_raw[r["area_code"]][key][ym] = float(r["value"])
+    months = sorted(months_set)
+    month_labels = ["%d-%02d" % ym for ym in months]
+
+    areas = []
+    series = {}
+
+    # ---------- 全国・都道府県 ----------
+    for code in sorted(pref_store.names):
+        nm = pref_store.names[code]["name"]
+        level = "national" if code == "00000" else "pref"
+        g = lambda y, c: pref_store.get(code, y, c)
+
+        sy, starts = pref_store.latest(code, ST_TOTAL, starts_years)
+        stock_y, stock_total = pref_store.latest(code, STOCK_TOTAL, list(range(1978, 2025)))
+        spend_y, spend = pref_store.latest(code, SP_TOTAL, spend_years)
+        wage_y, wage_m = pref_store.latest(code, WAGE_M, list(range(2015, 2025)))
+        job_y, job = pref_store.latest(code, JOB_RATIO, list(range(2015, 2025)))
+        mig_y, in_mig = pref_store.latest(code, IN_MIG, pop_years)
+        out_mig = g(mig_y, OUT_MIG) if mig_y else None
+        social = in_mig - out_mig if (in_mig is not None and out_mig is not None) else None
+        birth = g(mig_y, BIRTH) if mig_y else None
+        death = g(mig_y, DEATH) if mig_y else None
+
+        hh2020 = g(2020, HH)
+        pop2020 = g(2020, POP)
+        pop2050 = fut.get((code, 2050, "総人口")) if level == "pref" else fut_national(2050, "総人口")
+        old2050 = fut.get((code, 2050, "65歳以上人口")) if level == "pref" else fut_national(2050, "65歳以上人口")
+
+        summary = {
+            "code": code, "name": nm, "level": level,
+            "prefCode": "" if level == "national" else code[:2],
+            "prefName": "" if level == "national" else nm,
+            "startsYear": sy, "starts": starts,
+            "startsChg": rnd(chg(starts, g(sy - 1, ST_TOTAL) if sy else None)),
+            "owner": g(sy, ST_OWNER) if sy else None,
+            "ownerChg": rnd(chg(g(sy, ST_OWNER) if sy else None,
+                                g(sy - 1, ST_OWNER) if sy else None)),
+            "rent": g(sy, ST_RENT) if sy else None,
+            "sale": g(sy, ST_SALE) if sy else None,
+            "startsPer1k": rnd(per(starts, hh2020), 2),
+            "stockYear": stock_y, "stockTotal": stock_total,
+            "vacantRate": rnd(per(g(stock_y, STOCK_VACANT) if stock_y else None, stock_total, 100)),
+            "ownedRate": rnd(per(g(stock_y, STOCK_OWNED) if stock_y else None, stock_total, 100)),
+            "spendYear": spend_y, "spend": spend,
+            "spendHousing": g(spend_y, SP_HOUSING) if spend_y else None,
+            "spendFurniture": g(spend_y, SPEND_ITEMS["furniture"]) if spend_y else None,
+            "spendUtility": g(spend_y, SPEND_ITEMS["utility"]) if spend_y else None,
+            "savings": pref_store.latest(code, SAVINGS, list(range(1979, 2025)))[1],
+            "debtHousing": pref_store.latest(code, DEBT_HOUSING, list(range(1979, 2025)))[1],
+            "wageYear": wage_y, "wageM": wage_m,
+            "wageF": g(wage_y, WAGE_F) if wage_y else None,
+            "gradUni": g(wage_y, GRAD_UNI) if wage_y else None,
+            "gradHigh": g(wage_y, GRAD_HIGH) if wage_y else None,
+            "minWage": pref_store.latest(code, MIN_WAGE, list(range(2010, 2025)))[1],
+            "jobRatio": job, "jobYear": job_y,
+            "primary": g(2020, IND["primary"]), "secondary": g(2020, IND["secondary"]),
+            "tertiary": g(2020, IND["tertiary"]),
+            "pop2020": pop2020, "pop2000": g(2000, POP),
+            "hh2020": hh2020, "hh2000": g(2000, HH),
+            "size2020": rnd(per(g(2020, HH_MEMBER), hh2020, 1), 2),
+            "single2020": rnd(per(g(2020, HH_ALONE), hh2020, 100)),
+            "aging2020": rnd(g(2020, AGE_RATE)),
+            "social": social, "socialYear": mig_y,
+            "natural": birth - death if (birth is not None and death is not None) else None,
+            "pop2050": pop2050,
+            "aging2050": rnd(per(old2050, pop2050, 100)),
+            "socialPer1k": rnd(per(social, hh2020), 2),
+        }
+        summary["chg2050"] = rnd(chg(pop2050, pop2020))
+        summary["hhChg"] = rnd(chg(hh2020, g(2000, HH)))
+        summary["popChg"] = rnd(chg(pop2020, g(2000, POP)))
+        summary["score"] = (rnd(summary["socialPer1k"] - summary["startsPer1k"], 2)
+                            if summary["socialPer1k"] is not None
+                            and summary["startsPer1k"] is not None else None)
+        areas.append(summary)
+
+        # 時系列
+        mo = monthly_raw.get(code, {})
+        age_rows = []
+        for y in CENSUS:
+            tri = [g(y, AGE_Y), g(y, AGE_W), g(y, AGE_O)]
+            tot = sum(v for v in tri if v is not None)
+            if all(v is not None for v in tri) and tot > 0:
+                age_rows.append([y, rnd(tri[0] / tot * 100), rnd(tri[1] / tot * 100),
+                                 rnd(tri[2] / tot * 100), 0])
+        for y in AGE_PROJ:
+            if level == "national":
+                tri = [fut_national(y, i) for i in ("0～14歳人口", "15～64歳人口", "65歳以上人口")]
+            else:
+                tri = [fut.get((code, y, i)) for i in ("0～14歳人口", "15～64歳人口", "65歳以上人口")]
+            tot = sum(v for v in tri if v is not None)
+            if all(v is not None for v in tri) and tot > 0:
+                age_rows.append([y, rnd(tri[0] / tot * 100), rnd(tri[1] / tot * 100),
+                                 rnd(tri[2] / tot * 100), 1])
+
+        if level == "national":
+            fut_series = [fut_national(y, "総人口") for y in PROJ]
+        else:
+            fut_series = [fut.get((code, y, "総人口")) for y in PROJ]
+
+        series[code] = {
+            "m": clean([mo.get("total", {}).get(ym) for ym in months]),
+            "mo": clean([mo.get("owner", {}).get(ym) for ym in months]),
+            "st": clean(pref_store.series(code, ST_TOTAL, starts_years)),
+            "ow": clean(pref_store.series(code, ST_OWNER, starts_years)),
+            "re": clean(pref_store.series(code, ST_RENT, starts_years)),
+            "sa": clean(pref_store.series(code, ST_SALE, starts_years)),
+            "pop": clean(pref_store.series(code, POP, pop_years)),
+            "hh": clean([g(y, HH) for y in CENSUS]),
+            "old": clean([g(y, AGE_RATE) for y in pop_years]),
+            "sp": clean(pref_store.series(code, SP_TOTAL, spend_years)),
+            "sph": clean(pref_store.series(code, SP_HOUSING, spend_years)),
+            "fut": clean(fut_series),
+            "age": age_rows,
+            "mix": clean([g(spend_y, c) for c in SPEND_ITEMS.values()]) if spend_y else [],
+        }
+
+    # ---------- 市区町村 ----------
+    # 市区町村名は「滋賀県 大津市」の形で入っているため、県名を切り離す
+    pref_by_code = {a["code"][:2]: a["name"] for a in areas if a["level"] == "pref"}
+
+    for code in sorted(city_store.names):
+        info = city_store.names[code]
+        pref_name = pref_by_code.get(code[:2], info["pref"])
+        city_name = info["name"]
+        if pref_name and city_name.startswith(pref_name):
+            city_name = city_name[len(pref_name):].strip()
+        city_name = city_name.replace("\u3000", " ").strip() or info["name"]
+        g = lambda y, c: city_store.get(code, y, c)
+        sy, starts = city_store.latest(code, ST_TOTAL, city_starts_years)
+        stock_y, stock_total = city_store.latest(code, STOCK_TOTAL, list(range(1983, 2025)))
+        mig_y, in_mig = city_store.latest(code, IN_MIG, pop_years)
+        out_mig = g(mig_y, OUT_MIG) if mig_y else None
+        social = in_mig - out_mig if (in_mig is not None and out_mig is not None) else None
+        hh2020 = g(2020, HH)
+        pop2020 = g(2020, POP)
+        pop2050 = fut.get((code, 2050, "総人口"))
+        old2050 = fut.get((code, 2050, "65歳以上人口"))
+
+        summary = {
+            "code": code, "name": city_name, "level": "city",
+            "prefCode": code[:2], "prefName": pref_name,
+            "startsYear": sy, "starts": starts,
+            "startsChg": rnd(chg(starts, g(sy - 1, ST_TOTAL) if sy else None)),
+            "owner": g(sy, ST_OWNER) if sy else None,
+            "rent": g(sy, ST_RENT) if sy else None,
+            "sale": g(sy, ST_SALE) if sy else None,
+            "startsPer1k": rnd(per(starts, hh2020), 2),
+            "stockYear": stock_y, "stockTotal": stock_total,
+            "vacantRate": rnd(per(g(stock_y, STOCK_VACANT) if stock_y else None, stock_total, 100)),
+            "ownedRate": rnd(per(g(stock_y, STOCK_OWNED) if stock_y else None, stock_total, 100)),
+            "pop2020": pop2020, "pop2000": g(2000, POP),
+            "hh2020": hh2020, "hh2000": g(2000, HH),
+            "size2020": rnd(per(g(2020, HH_MEMBER), hh2020, 1), 2),
+            "single2020": rnd(per(g(2020, HH_ALONE), hh2020, 100)),
+            "aging2020": rnd(g(2020, AGE_RATE) or per(g(2020, AGE_O), pop2020, 100)),
+            "social": social, "socialYear": mig_y,
+            "socialPer1k": rnd(per(social, hh2020), 2),
+            "pop2050": pop2050,
+            "aging2050": rnd(per(old2050, pop2050, 100)),
+        }
+        summary["chg2050"] = rnd(chg(pop2050, pop2020))
+        summary["hhChg"] = rnd(chg(hh2020, g(2000, HH)))
+        summary["ownerShare"] = rnd(per(summary["owner"], starts, 100))
+        summary["score"] = (rnd(summary["socialPer1k"] - summary["startsPer1k"], 2)
+                            if summary["socialPer1k"] is not None
+                            and summary["startsPer1k"] is not None else None)
+        areas.append(summary)
+
+        age_rows = []
+        for y in CENSUS:
+            tri = [g(y, AGE_Y), g(y, AGE_W), g(y, AGE_O)]
+            tot = sum(v for v in tri if v is not None)
+            if all(v is not None for v in tri) and tot > 0:
+                age_rows.append([y, rnd(tri[0] / tot * 100), rnd(tri[1] / tot * 100),
+                                 rnd(tri[2] / tot * 100), 0])
+        for y in AGE_PROJ:
+            tri = [fut.get((code, y, i)) for i in ("0～14歳人口", "15～64歳人口", "65歳以上人口")]
+            tot = sum(v for v in tri if v is not None)
+            if all(v is not None for v in tri) and tot > 0:
+                age_rows.append([y, rnd(tri[0] / tot * 100), rnd(tri[1] / tot * 100),
+                                 rnd(tri[2] / tot * 100), 1])
+
+        series[code] = {
+            "st": clean(city_store.series(code, ST_TOTAL, city_starts_years)),
+            "ow": clean(city_store.series(code, ST_OWNER, city_starts_years)),
+            "re": clean(city_store.series(code, ST_RENT, city_starts_years)),
+            "sa": clean(city_store.series(code, ST_SALE, city_starts_years)),
+            "pop": clean([g(y, POP) for y in CENSUS]),
+            "hh": clean([g(y, HH) for y in CENSUS]),
+            "fut": clean([fut.get((code, y, "総人口")) for y in PROJ]),
+            "age": age_rows,
+        }
+
+    # 中身が空の系列は落として、埋め込むJSONを軽くする
+    for code, sr in series.items():
+        for key in list(sr):
+            val = sr[key]
+            if isinstance(val, list) and (not val or all(v is None for v in val)):
+                del sr[key]
+
+    # ---- 4区分の境目（着工が公表されている市区町村の中央値）
+    def median(xs):
+        xs = sorted(x for x in xs if x is not None)
+        if not xs:
+            return None
+        n = len(xs)
+        return xs[n // 2] if n % 2 else (xs[n // 2 - 1] + xs[n // 2]) / 2
+
+    scored = [a for a in areas if a["level"] == "city" and a.get("score") is not None]
+    dmid = median([a["socialPer1k"] for a in scored])
+    smid = median([a["startsPer1k"] for a in scored])
+
+    def quadrant(a):
+        d, s = a.get("socialPer1k"), a.get("startsPer1k")
+        if d is None or s is None:
+            return None
+        if d >= dmid and s < smid:
+            return "狙い目"
+        if d >= dmid and s >= smid:
+            return "過熱気味"
+        if d < dmid and s >= smid:
+            return "供給過剰の芽"
+        return "冷え込み"
+
     counts = defaultdict(int)
-    for c in cities:
-        if c["quadrant"]:
-            counts[c["quadrant"]] += 1
+    for a in areas:
+        if a["level"] in ("city", "pref"):
+            a["quadrant"] = quadrant(a)
+            if a["level"] == "city" and a["quadrant"]:
+                counts[a["quadrant"]] += 1
 
-    # 埋め込みを軽くするため、ページで使う列だけに絞る
-    keep = ["code", "name", "pref", "starts", "startsChg", "startsPer1k", "socialPer1k",
-            "score", "hh2020", "pop2020", "quadrant", "chg2050", "vacantRate", "ownerShare"]
-    slim = [{k: c.get(k) for k in keep} for c in cities]
-    slim_top = [{k: c.get(k) for k in keep} for c in scored[:15]]
-    slim_bottom = [{k: c.get(k) for k in keep} for c in scored[-15:][::-1]]
+    # 値のない項目は書き出さない（画面側では未定義を「—」として扱う）
+    areas = [{k: v for k, v in a.items() if v is not None} for a in areas]
 
     bundle = {
-        "national": national,
-        "cityStartsYear": cities[0]["startsYear"] if cities else None,
-        "citySocialYear": cities[0]["socialYear"] if cities else None,
-        "prefectures": prefs,
-        "monthly": monthly,
-        "annualTypes": annual_types,
-        "cities": slim,
-        "cityTop": slim_top,
-        "cityBottom": slim_bottom,
-        "quadrantCounts": dict(counts),
-        "quadrantMid": {"demand": rnd(dmid, 2), "supply": rnd(smid, 2)},
-        "cityScoredCount": len(scored),
-        **extras,
+        "meta": {
+            "months": month_labels,
+            "startsYears": starts_years,
+            "cityStartsYears": city_starts_years,
+            "popYears": pop_years,
+            "censusYears": CENSUS,
+            "spendYears": spend_years,
+            "projYears": PROJ,
+            "spendKeys": list(SPEND_ITEMS.keys()),
+            "quadrantMid": {"demand": rnd(dmid, 2), "supply": rnd(smid, 2)},
+            "quadrantCounts": dict(counts),
+            "cityWithStarts": len([a for a in areas if a["level"] == "city" and a.get("starts") is not None]),
+            "cityTotal": len([a for a in areas if a["level"] == "city"]),
+            "built": "2026-09-11",
+        },
+        "areas": areas,
+        "series": series,
     }
     path = OUT / "report_data.json"
     path.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")),
                     encoding="utf-8")
     print(f"{path.relative_to(ROOT)}  {path.stat().st_size/1024:.0f}KB")
-    print(f"  月次 {len(monthly)}か月（{monthly[0]['y']}年{monthly[0]['m']}月〜"
-          f"{monthly[-1]['y']}年{monthly[-1]['m']}月）")
-    print(f"  年次（通年そろう年）{len(annual_types)}年 / 都道府県 {len(prefs)} / "
-          f"市区町村 {len(cities)}（スコア対象 {len(scored)}）")
-    print(f"  4区分の内訳: {dict(counts)}  中央値 需要{rnd(dmid,2)} 供給{rnd(smid,2)}")
+    print(f"  地域 {len(areas)}件（全国1 / 都道府県47 / 市区町村"
+          f"{len([a for a in areas if a['level'] == 'city'])}）")
+    print(f"  月次 {len(months)}か月 {month_labels[0]}〜{month_labels[-1]}")
+    print(f"  着工の公表がある市区町村 {bundle['meta']['cityWithStarts']}件")
+    print(f"  4区分 {dict(counts)}  境目 需要{rnd(dmid,2)} 供給{rnd(smid,2)}")
 
 
 if __name__ == "__main__":
