@@ -19,3 +19,5 @@ data/processed/all_indicators.csv
 
 # レポートに埋め込むデータ（テンプレートとスクリプトから再生成できる）
 data/processed/report_data.json
+data/processed/migration_flow.csv
+data/processed/age_bands_future.csv

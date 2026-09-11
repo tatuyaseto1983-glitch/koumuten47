@@ -38,6 +38,22 @@ MIN_WAGE, JOB_RATIO = "F6501", "F310301"
 IND = {"primary": "F2201", "secondary": "F2211", "tertiary": "F2221"}
 MONTHLY_CAT = {"total": "11", "owner": "12", "rent": "13", "sale": "15",
                "mansion": "16", "detached": "17"}
+# 世帯の家族類型
+HH_TYPES = {"alone": "A810105", "nuclear": "A810102", "family": "A810101",
+            "elderAlone": "A8301", "elderCouple": "A8202"}
+LAND_PRICE = "H4210"          # 3.3m2当たり住宅敷地価額（百円）
+FLOW_YEARS = [2020, 2021, 2022, 2023, 2024, 2025]
+AGE_HIST_YEARS = [1980, 1990, 2000, 2010, 2020]
+AGE_FUT_PREF = [2020, 2030, 2040, 2050]
+AGE_FUT_CITY = [2020, 2050]
+# 建築の時期（住宅・土地統計調査の区分）
+BUILD_ERAS = ["1970年以前", "1971～1980年", "1981～1990年", "1991～2000年", "2001～2005年",
+              "2006～2010年", "2011～2015年", "2016～2020年", "2021～2023年9月"]
+WORK_KINDS = {"total": "総数", "done": "工事等をした", "none": "工事等をしていない",
+              "insul": "窓・壁等の断熱・結露防止工事", "roof": "屋根・外壁等の改修工事",
+              "water": "台所・トイレ・浴室・洗面所の改修工事"}
+VACANCY_KINDS = {"total": "総数", "rental": "賃貸用の空き家", "sale": "売却用の空き家",
+                 "second": "二次的住宅", "other": "賃貸・売却用及び二次的住宅を除く空き家"}
 
 
 def load(name: str) -> list[dict]:
@@ -115,6 +131,171 @@ def clean(seq):
     return out
 
 
+def load_flow_areas() -> dict:
+    """転入元・転出先の地域一覧。レベル 2=都道府県 / 3=市町村（政令市は市単位）/ 4=区。"""
+    path = OUT / "migration_flow_areas.csv"
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8-sig") as f:
+        return {r["code"]: r for r in csv.DictReader(f)}
+
+
+def build_flow(top_n: int = 10) -> dict:
+    """転入元・転出先を地域ごとにまとめる。
+
+    この統計表は「移動前（origin）から移動後（dest）へ何人」という形なので、
+    dest でまとめれば転入元、origin でまとめれば転出先になる。
+    階層が重なると二重に数えてしまうため、レベルをそろえて取り出す。
+    """
+    path = OUT / "migration_flow.csv"
+    meta = load_flow_areas()
+    if not path.exists() or not meta:
+        return {}
+    inflow: dict[str, dict[str, dict[int, int]]] = defaultdict(lambda: defaultdict(dict))
+    outflow: dict[str, dict[str, dict[int, int]]] = defaultdict(lambda: defaultdict(dict))
+    with path.open(encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            y, o, d, v = int(r["year"]), r["origin_code"], r["dest_code"], int(r["value"])
+            inflow[d][o][y] = v
+            outflow[o][d][y] = v
+
+    latest = max(FLOW_YEARS)
+
+    def level_of(code):
+        return meta.get(code, {}).get("level", "")
+
+    def pack(bucket: dict, level: str, with_series: bool):
+        rows = [(c, vals) for c, vals in bucket.items() if level_of(c) == level]
+        rows.sort(key=lambda x: -x[1].get(latest, 0))
+        out = []
+        for code, vals in rows[:top_n]:
+            if not vals.get(latest):
+                continue
+            entry = [code]
+            entry += [vals.get(y) for y in FLOW_YEARS] if with_series else [vals.get(latest)]
+            out.append(entry)
+        return out
+
+    # 「その他の市町村」だけでは区別がつかないので、親の都道府県名を頭に付ける
+    def display_name(code, m):
+        name = m["name"]
+        parent = meta.get(m.get("parent", ""), {})
+        if name.startswith("その他") and parent.get("name"):
+            return parent["name"] + "の" + name
+        return name
+
+    result = {"__names__": {c: display_name(c, m) for c, m in meta.items()}}
+    for code in set(inflow) | set(outflow):
+        ins, outs = inflow.get(code, {}), outflow.get(code, {})
+        entry = {}
+        for key, bucket, level, series_flag in (
+            ("cityIn", ins, "3", True), ("prefIn", ins, "2", True),
+            ("cityOut", outs, "3", False), ("prefOut", outs, "2", False),
+        ):
+            packed = pack(bucket, level, series_flag)
+            if packed:
+                entry[key] = packed
+        if entry:
+            result[code] = entry
+    return result
+
+
+def build_age_bands() -> tuple[dict, list[str]]:
+    """年齢5歳階級。都道府県は実績の推移、市区町村は社人研の推計で補う。"""
+    hist: dict[str, dict[int, dict[str, float]]] = defaultdict(lambda: defaultdict(dict))
+    band_order: list[str] = []
+    for r in load("age_bands_pref"):
+        if r["value"] == "" or not r["year"]:
+            continue
+        name = code_of(r["cat_code"])
+        label = r["cat_name"].split("|")[-1].split("_")[-1]
+        if not re.match(r"^\d+[～~]\d+歳人口$|^\d+歳以上人口$", label):
+            continue
+        band = label.replace("人口", "")
+        if band not in band_order:
+            band_order.append(band)
+        hist[r["area_code"]][int(r["year"])][band] = float(r["value"])
+
+    fut: dict[str, dict[int, dict[str, float]]] = defaultdict(lambda: defaultdict(dict))
+    fut_bands: list[str] = []
+    path = OUT / "age_bands_future.csv"
+    if path.exists():
+        with path.open(encoding="utf-8-sig") as f:
+            for r in csv.DictReader(f):
+                if r["band"] == "総数":
+                    continue
+                if r["band"] not in fut_bands:
+                    fut_bands.append(r["band"])
+                fut[r["area_code"]][int(r["year"])][r["band"]] = float(r["value"])
+
+    def sort_bands(bands):
+        def key(b):
+            m = re.match(r"^(\d+)", b)
+            return int(m.group(1)) if m else 999
+        return sorted(bands, key=key)
+
+    bands = sort_bands(set(band_order) | set(fut_bands))
+    out = {}
+    for code in set(hist) | set(fut):
+        entry = {}
+        years = AGE_FUT_PREF if code.endswith("000") else AGE_FUT_CITY
+        h = {}
+        for y in AGE_HIST_YEARS:
+            vals = hist.get(code, {}).get(y)
+            if vals:
+                h[str(y)] = clean([vals.get(b) for b in bands])
+        if h:
+            entry["hist"] = h
+        fu = {}
+        for y in years:
+            vals = fut.get(code, {}).get(y)
+            if vals:
+                fu[str(y)] = clean([vals.get(b) for b in bands])
+        if fu:
+            entry["fut"] = fu
+        if entry:
+            out[code] = entry
+    return out, bands
+
+
+def build_vacancy() -> dict:
+    """空き家の内訳。項目名は「空き家数|腐朽|建て方|構造|種類」の順で入っている。"""
+    out: dict[str, dict] = {}
+    for r in load("vacancy_detail_all"):
+        if r["value"] == "":
+            continue
+        parts = r["cat_name"].split("|")
+        if len(parts) < 5:
+            continue
+        decay, build, struct, kind = parts[1], parts[2], parts[3], parts[4]
+        area = out.setdefault(r["area_code"], {})
+        if decay == "総数" and build == "総数" and struct == "総数":
+            for key, label in VACANCY_KINDS.items():
+                if kind == label:
+                    area[key] = float(r["value"])
+        if decay == "腐朽・破損あり" and build == "総数" and struct == "総数" and kind == "総数":
+            area["decayed"] = float(r["value"])
+        if decay == "総数" and build == "一戸建" and struct == "総数" and kind == "総数":
+            area["detached"] = float(r["value"])
+    return out
+
+
+def build_housing_age() -> dict:
+    """建築時期別の持ち家と、2019年以降の改修工事の状況。"""
+    out: dict[str, dict[str, dict[str, float]]] = defaultdict(lambda: defaultdict(dict))
+    for r in load("housing_age_all"):
+        if r["value"] == "":
+            continue
+        parts = r["cat_name"].split("|")
+        if len(parts) < 3:
+            continue
+        era, work = parts[1], parts[2]
+        for key, label in WORK_KINDS.items():
+            if work == label:
+                out[r["area_code"]][era][key] = float(r["value"])
+    return out
+
+
 def main() -> None:
     # ---- 都道府県（全国を含む）
     pref_store = Store()
@@ -124,6 +305,7 @@ def main() -> None:
         pref_store.add(load(name))
 
     pop_years = list(range(1975, 2025))
+    mig_years = list(range(1975, 2026))   # 転入・転出は2025年まで公表されている
     starts_years = list(range(1975, 2025))
     spend_years = list(range(2000, 2026))
 
@@ -163,6 +345,12 @@ def main() -> None:
     months = sorted(months_set)
     month_labels = ["%d-%02d" % ym for ym in months]
 
+    flows = build_flow()
+    flow_names = flows.pop("__names__", {})
+    age_bands, age_band_labels = build_age_bands()
+    vacancy = build_vacancy()
+    housing_age = build_housing_age()
+
     areas = []
     series = {}
 
@@ -177,7 +365,7 @@ def main() -> None:
         spend_y, spend = pref_store.latest(code, SP_TOTAL, spend_years)
         wage_y, wage_m = pref_store.latest(code, WAGE_M, list(range(2015, 2025)))
         job_y, job = pref_store.latest(code, JOB_RATIO, list(range(2015, 2025)))
-        mig_y, in_mig = pref_store.latest(code, IN_MIG, pop_years)
+        mig_y, in_mig = pref_store.latest(code, IN_MIG, mig_years)
         out_mig = g(mig_y, OUT_MIG) if mig_y else None
         social = in_mig - out_mig if (in_mig is not None and out_mig is not None) else None
         birth = g(mig_y, BIRTH) if mig_y else None
@@ -227,6 +415,11 @@ def main() -> None:
             "pop2050": pop2050,
             "aging2050": rnd(per(old2050, pop2050, 100)),
             "socialPer1k": rnd(per(social, hh2020), 2),
+            "inMig": in_mig, "outMig": out_mig,
+            "landPrice": pref_store.latest(code, LAND_PRICE, list(range(1975, 2025)))[1],
+            "hhAlone": g(2020, HH_TYPES["alone"]),
+            "hhNuclear": g(2020, HH_TYPES["nuclear"]),
+            "hhElderAlone": g(2020, HH_TYPES["elderAlone"]),
         }
         summary["chg2050"] = rnd(chg(pop2050, pop2020))
         summary["hhChg"] = rnd(chg(hh2020, g(2000, HH)))
@@ -273,6 +466,8 @@ def main() -> None:
             "sp": clean(pref_store.series(code, SP_TOTAL, spend_years)),
             "sph": clean(pref_store.series(code, SP_HOUSING, spend_years)),
             "fut": clean(fut_series),
+            "migIn": clean([g(y, IN_MIG) for y in FLOW_YEARS]),
+            "migOut": clean([g(y, OUT_MIG) for y in FLOW_YEARS]),
             "age": age_rows,
             "mix": clean([g(spend_y, c) for c in SPEND_ITEMS.values()]) if spend_y else [],
         }
@@ -291,7 +486,7 @@ def main() -> None:
         g = lambda y, c: city_store.get(code, y, c)
         sy, starts = city_store.latest(code, ST_TOTAL, city_starts_years)
         stock_y, stock_total = city_store.latest(code, STOCK_TOTAL, list(range(1983, 2025)))
-        mig_y, in_mig = city_store.latest(code, IN_MIG, pop_years)
+        mig_y, in_mig = city_store.latest(code, IN_MIG, mig_years)
         out_mig = g(mig_y, OUT_MIG) if mig_y else None
         social = in_mig - out_mig if (in_mig is not None and out_mig is not None) else None
         hh2020 = g(2020, HH)
@@ -320,6 +515,11 @@ def main() -> None:
             "socialPer1k": rnd(per(social, hh2020), 2),
             "pop2050": pop2050,
             "aging2050": rnd(per(old2050, pop2050, 100)),
+            "inMig": in_mig, "outMig": out_mig,
+            "landPrice": city_store.latest(code, LAND_PRICE, list(range(1975, 2025)))[1],
+            "hhAlone": g(2020, HH_TYPES["alone"]),
+            "hhNuclear": g(2020, HH_TYPES["nuclear"]),
+            "hhElderAlone": g(2020, HH_TYPES["elderAlone"]),
         }
         summary["chg2050"] = rnd(chg(pop2050, pop2020))
         summary["hhChg"] = rnd(chg(hh2020, g(2000, HH)))
@@ -351,8 +551,54 @@ def main() -> None:
             "pop": clean([g(y, POP) for y in CENSUS]),
             "hh": clean([g(y, HH) for y in CENSUS]),
             "fut": clean([fut.get((code, y, "総人口")) for y in PROJ]),
+            "migIn": clean([g(y, IN_MIG) for y in FLOW_YEARS]),
+            "migOut": clean([g(y, OUT_MIG) for y in FLOW_YEARS]),
             "age": age_rows,
         }
+
+    # 空き家の内訳・建築時期・年齢階級・転入元を、地域ごとにひもづける
+    for a in areas:
+        code = a["code"]
+        v = vacancy.get(code)
+        if v:
+            a["vacTotal"] = v.get("total")
+            a["vacRental"] = v.get("rental")
+            a["vacSale"] = v.get("sale")
+            a["vacSecond"] = v.get("second")
+            a["vacOther"] = v.get("other")
+            a["vacDecayed"] = v.get("decayed")
+            a["vacDetached"] = v.get("detached")
+            if v.get("total"):
+                a["vacOtherShare"] = rnd(per(v.get("other"), v["total"], 100))
+                a["vacDecayShare"] = rnd(per(v.get("decayed"), v["total"], 100))
+        if a.get("hhAlone") and a.get("hh2020"):
+            a["aloneShare"] = rnd(per(a["hhAlone"], a["hh2020"], 100))
+        if a.get("hhElderAlone") and a.get("hh2020"):
+            a["elderAloneShare"] = rnd(per(a["hhElderAlone"], a["hh2020"], 100))
+        ha = housing_age.get(code)
+        if ha and ha.get("総数", {}).get("total"):
+            tot = ha["総数"]["total"]
+            old = sum(ha.get(e, {}).get("total", 0) for e in BUILD_ERAS[:2])
+            a["ownedTotal"] = tot
+            a["ownedPre1980"] = old
+            a["ownedPre1980Share"] = rnd(per(old, tot, 100))
+            done = ha.get("総数", {}).get("done")
+            if done is not None:
+                a["renovDone"] = done
+                a["renovShare"] = rnd(per(done, tot, 100))
+        sr = series.get(code)
+        if sr is None:
+            continue
+        fl = flows.get(code)
+        if fl:
+            sr["flow"] = fl
+        ab = age_bands.get(code)
+        if ab:
+            sr["ageBands"] = ab
+        if ha:
+            sr["buildEra"] = {e: clean([ha.get(e, {}).get(k) for k in
+                                        ["total", "done", "none", "insul", "roof", "water"]])
+                              for e in BUILD_ERAS if e in ha}
 
     # 中身が空の系列は落として、埋め込むJSONを軽くする
     for code, sr in series.items():
@@ -405,6 +651,13 @@ def main() -> None:
             "spendYears": spend_years,
             "projYears": PROJ,
             "spendKeys": list(SPEND_ITEMS.keys()),
+            "flowYears": FLOW_YEARS,
+            "ageBandLabels": age_band_labels,
+            "ageHistYears": AGE_HIST_YEARS,
+            "ageFutPref": AGE_FUT_PREF,
+            "ageFutCity": AGE_FUT_CITY,
+            "buildEras": BUILD_ERAS,
+            "workKinds": list(WORK_KINDS.keys()),
             "quadrantMid": {"demand": rnd(dmid, 2), "supply": rnd(smid, 2)},
             "quadrantCounts": dict(counts),
             "cityWithStarts": len([a for a in areas if a["level"] == "city" and a.get("starts") is not None]),
@@ -413,6 +666,8 @@ def main() -> None:
         },
         "areas": areas,
         "series": series,
+        "flowNames": {c: n for c, n in flow_names.items()
+                      if c not in {a["code"] for a in areas}},
     }
     path = OUT / "report_data.json"
     path.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")),
@@ -423,6 +678,9 @@ def main() -> None:
     print(f"  月次 {len(months)}か月 {month_labels[0]}〜{month_labels[-1]}")
     print(f"  着工の公表がある市区町村 {bundle['meta']['cityWithStarts']}件")
     print(f"  4区分 {dict(counts)}  境目 需要{rnd(dmid,2)} 供給{rnd(smid,2)}")
+    print(f"  転入元あり {len(flows)}地域 / 年齢階級あり {len(age_bands)}地域 "
+          f"({len(age_band_labels)}区分) / 空き家内訳 {len(vacancy)}地域 / "
+          f"建築時期 {len(housing_age)}地域")
 
 
 if __name__ == "__main__":

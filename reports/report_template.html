@@ -656,9 +656,13 @@
           });
           rect.addEventListener("mouseleave", function () { tip.hide(); });
           svg.appendChild(rect);
-          txt(svg, pos ? zero + w + 6 : X(r.value) - 6, y + rowH / 2 + 4,
+          var lx = pos ? zero + w + 6 : X(r.value) - 6;
+          var anchor = pos ? "start" : "end";
+          if (!pos && lx < 44) { lx = X(r.value) + 6; anchor = "start"; }
+          if (pos && lx > W - 8) { lx = zero + w - 6; anchor = "end"; }
+          txt(svg, lx, y + rowH / 2 + 4,
             opts.fmtValue ? opts.fmtValue(r.value) : num(r.value),
-            pos ? "start" : "end", "--ink-2", 11);
+            anchor, "--ink-2", 11);
         }
         var nm = txt(svg, m.l - 8, y + rowH / 2 + 4, r.label, "end",
           r.current ? "--brand-ink" : "--ink", 12, r.current ? 700 : 400);
@@ -708,7 +712,9 @@
         });
         if (rows.length < 9 || i % 2 === 0) txt(svg, cx, H - 24, r[0], "middle");
         if (i === 0 || i === rows.length - 1) {
-          txt(svg, cx, m.t + (r[3] / 100 * ih) / 2 + 4, fixed(r[3]) + "%", "middle",
+          // 右端のラベルが枠から出ないように寄せる
+          var lx = Math.min(Math.max(cx, m.l + 18), m.l + iw - 18);
+          txt(svg, lx, m.t + (r[3] / 100 * ih) / 2 + 4, fixed(r[3]) + "%", "middle",
             "--ord-3-ink", 11, 600);
         }
       });
@@ -719,6 +725,61 @@
         txt(svg, m.l + (sx - m.l) / 2, H - 6, "実績", "middle");
         txt(svg, sx + (m.l + iw - sx) / 2, H - 6, "推計", "middle");
       }
+      wrap.appendChild(svg);
+      tip = makeTip(wrap);
+    };
+  }
+
+  // 年齢階級（横向きの棒を年ごとに並べる）
+  function ageProfile(sets, labels) {
+    return function (wrap) {
+      var live = sets.filter(function (x) { return x.values && x.values.some(has); });
+      if (!live.length) { empty(wrap, "この地域には年齢階級のデータがありません。"); return; }
+      var W = Math.max(wrap.clientWidth, 280);
+      var rowH = Math.max(Math.min(26, 520 / labels.length), 16);
+      var m = { t: 22, r: 54, b: 8, l: 74 };
+      var H = m.t + labels.length * rowH + m.b;
+      var iw = W - m.l - m.r;
+      var maxV = 0;
+      live.forEach(function (se) {
+        se.values.forEach(function (v) { if (has(v) && v > maxV) maxV = v; });
+      });
+      if (!maxV) { empty(wrap); return; }
+      var X = function (v) { return m.l + v / maxV * iw; };
+      var svg = s("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H,
+        role: "img", "aria-label": "年齢階級別の人口" });
+      niceTicks(0, maxV, 3).forEach(function (v) {
+        svg.appendChild(s("line", { x1: X(v), x2: X(v), y1: m.t - 5, y2: H - m.b,
+          stroke: css("--grid"), "stroke-width": 1 }));
+        txt(svg, X(v), 13, v >= 10000 ? num(v / 10000, 0) + "万" : num(v), "middle");
+      });
+      var tip = null;
+      var bh = (rowH - 6) / live.length;
+      labels.forEach(function (label, i) {
+        var y0 = m.t + i * rowH;
+        if (i % 2 === 1) svg.appendChild(s("rect", { x: 0, y: y0, width: W, height: rowH,
+          fill: css("--surface-sunk") }));
+        live.forEach(function (se, j) {
+          var v = se.values[i];
+          if (!has(v)) return;
+          var rect = s("rect", { x: m.l, y: y0 + 3 + j * bh, width: Math.max(X(v) - m.l, 1),
+            height: Math.max(bh - 1.5, 2), fill: css(se.color), rx: 1.5 });
+          rect.addEventListener("mouseenter", function () {
+            var box = svg.getBoundingClientRect();
+            tip.show('<div class="tip-t">' + label + "</div>" +
+              live.map(function (ss) {
+                return has(ss.values[i]) ? tipRow(ss.color, ss.label, num(ss.values[i]) + "人") : "";
+              }).join(""), (m.l + (X(v) - m.l) / 2) * (box.width / W),
+              (y0 + 2) * (box.height / H));
+          });
+          rect.addEventListener("mouseleave", function () { tip.hide(); });
+          svg.appendChild(rect);
+        });
+        var nm = txt(svg, m.l - 7, y0 + rowH / 2 + 4, label, "end", "--ink", 11.5);
+        nm.setAttribute("font-family", css("--sans") || "sans-serif");
+        var top = live[0].values[i];
+        if (has(top)) txt(svg, X(top) + 5, y0 + rowH / 2 + 4, num(top), "start", "--ink-2", 10.5);
+      });
       wrap.appendChild(svg);
       tip = makeTip(wrap);
     };
@@ -943,7 +1004,9 @@
   var TABS = [
     { id: "overview", name: "概要" },
     { id: "starts", name: "着工" },
+    { id: "stock", name: "住宅ストック" },
     { id: "population", name: "人口・世帯" },
+    { id: "flow", name: "人の動き" },
     { id: "kakei", name: "家計" },
     { id: "work", name: "働く人" },
     { id: "rank", name: "ランキング" },
@@ -969,8 +1032,9 @@
     var panel = document.getElementById("panel");
     panel.textContent = "";
     PENDING = [];
-    var map = { overview: tabOverview, starts: tabStarts, population: tabPopulation,
-      kakei: tabKakei, work: tabWork, rank: tabRank, about: tabAbout };
+    var map = { overview: tabOverview, starts: tabStarts, stock: tabStock,
+      population: tabPopulation, flow: tabFlow, kakei: tabKakei, work: tabWork,
+      rank: tabRank, about: tabAbout };
     (map[state.tab] || tabOverview)(panel);
     redrawCharts();
   }
@@ -1185,19 +1249,232 @@
         zero: true, unit: "戸", unitY: "戸", ratio: 0.38, aria: "利用関係別の着工推移"
       })));
 
-    if (has(a.stockTotal)) {
-      panel.appendChild(headline("住宅ストック",
-        "すでに建っている住宅の量です。リフォームや民泊の物件確保を考えるときの土台になります。"));
-      panel.appendChild(tiles([
-        { label: "総住宅数", value: man(a.stockTotal), unit: "万戸",
-          sub: a.stockYear + "年・住宅土地統計調査" },
-        { label: "空き家率", value: fixed(a.vacantRate), unit: "%",
-          sub: a.level === "national" ? "全国平均" : "全国は " + fixed(NATIONAL.vacantRate) + "％" },
-        { label: "持ち家率", value: fixed(a.ownedRate), unit: "%",
-          sub: a.level === "national" ? "全国平均" : "全国は " + fixed(NATIONAL.ownedRate) + "％" },
-        { label: "世帯あたり住宅数", value: fixed(a.stockTotal / a.hh2020, 2), unit: "戸",
-          sub: "1を超える分が空き家や別荘などです" }
+  }
+
+  // ---------- 住宅ストック ----------
+  function tabStock(panel) {
+    var a = currentArea();
+    var sr = SERIES[a.code] || {};
+    panel.appendChild(headline((a.level === "national" ? "全国" : a.name) + "の住宅ストック",
+      "すでに建っている住宅の量と中身です。リフォームの対象規模や、民泊・再生に回せる空き家がどれだけあるかを見ます。"));
+
+    if (!has(a.stockTotal) && !has(a.ownedTotal)) {
+      panel.appendChild(notice("<b>この地域は住宅ストックの公表がありません。</b>" +
+        "住宅・土地統計調査の市区町村別は、人口の少ない町村が対象外になることがあります。" +
+        (a.level === "city" ? "上の市区町村欄で「県全体」を選ぶと" + a.prefName + "の数字が見られます。" : "")));
+      return;
+    }
+
+    panel.appendChild(tiles([
+      { label: "総住宅数", value: man(a.stockTotal), unit: "万戸",
+        sub: a.stockYear + "年・住宅土地統計調査" },
+      { label: "空き家率", value: fixed(a.vacantRate), unit: "%",
+        sub: a.level === "national" ? "全国平均" : "全国は " + fixed(NATIONAL.vacantRate) + "％" },
+      { label: "持ち家率", value: fixed(a.ownedRate), unit: "%",
+        sub: a.level === "national" ? "全国平均" : "全国は " + fixed(NATIONAL.ownedRate) + "％" },
+      { label: "住宅地の価格", value: has(a.landPrice) ? num(a.landPrice * 100 / 3.3) : "—",
+        unit: "円/m2", sub: "3.3m2あたり " + (has(a.landPrice) ? num(a.landPrice * 100) : "—") + "円" },
+      { label: "1980年以前の持ち家", value: num(a.ownedPre1980), unit: "戸",
+        sub: has(a.ownedPre1980Share) ? "持ち家の " + fixed(a.ownedPre1980Share) +
+          "％。耐震・断熱リフォームの母数です" : "" },
+      { label: "2019年以降に改修した持ち家", value: num(a.renovDone), unit: "戸",
+        sub: has(a.renovShare) ? "持ち家の " + fixed(a.renovShare) + "％" : "" }
+    ]));
+
+    if (has(a.vacTotal)) {
+      var vac = [
+        { key: "other", label: "その他（放置）", value: a.vacOther, color: "--s2" },
+        { key: "rental", label: "賃貸用", value: a.vacRental, color: "--ord-2" },
+        { key: "sale", label: "売却用", value: a.vacSale, color: "--ord-2" },
+        { key: "second", label: "二次的住宅（別荘など）", value: a.vacSecond, color: "--ord-2" }
+      ].filter(function (r) { return has(r.value); })
+       .map(function (r) {
+         r.tip = tipRow(r.color, "戸数", num(r.value) + "戸") +
+           tipRow(null, "空き家に占める割合", fixed(r.value / a.vacTotal * 100) + "%");
+         return r;
+       });
+      var cols = el("div", "cols");
+      cols.appendChild(figure("空き家の内訳",
+        "住宅・土地統計調査 " + a.stockYear + "年。「その他」は賃貸にも売却にも出ていない、" +
+        "いわゆる放置された空き家です", null,
+        rankedBars(vac, { rowH: 30, leftPad: 128,
+          fmtValue: function (v) { return num(v); }, aria: "空き家の内訳" })));
+
+      var box = el("div", "method");
+      box.appendChild(el("span", "k", "使える空き家はどれだけあるか"));
+      box.appendChild(tiles([
+        { label: "その他（放置）の空き家", value: num(a.vacOther), unit: "戸",
+          sub: has(a.vacOtherShare) ? "空き家の " + fixed(a.vacOtherShare) + "％" : "" },
+        { label: "腐朽・破損あり", value: num(a.vacDecayed), unit: "戸",
+          sub: has(a.vacDecayShare) ? "空き家の " + fixed(a.vacDecayShare) +
+            "％。手を入れる前提になります" : "" },
+        { label: "一戸建の空き家", value: num(a.vacDetached), unit: "戸",
+          sub: has(a.vacDetached) && a.vacTotal ?
+            "空き家の " + fixed(a.vacDetached / a.vacTotal * 100) + "％" : "" }
       ]));
+      box.appendChild(el("p", null,
+        "民泊や一棟貸しに回せるのは、主に「その他（放置）」で腐朽・破損のない一戸建です。" +
+        "この3つの数字の重なりが、実際に動かせる物件の目安になります。"));
+      cols.appendChild(box);
+      panel.appendChild(cols);
+    }
+
+    if (sr.buildEra) {
+      var eras = META.buildEras.filter(function (e) { return sr.buildEra[e]; });
+      var idx = META.workKinds.indexOf("total");
+      var doneIdx = META.workKinds.indexOf("done");
+      var insulIdx = META.workKinds.indexOf("insul");
+      panel.appendChild(figure("建築時期別の持ち家数",
+        "住宅・土地統計調査 " + a.stockYear + "年。1981年より前は現在の耐震基準を満たしていない可能性があります",
+        [{ color: "--s2", label: "1980年以前", shape: "sq" },
+         { color: "--ord-2", label: "1981年以降", shape: "sq" }],
+        rankedBars(eras.map(function (e, i) {
+          var v = sr.buildEra[e][idx];
+          var done = sr.buildEra[e][doneIdx];
+          var insul = sr.buildEra[e][insulIdx];
+          return { label: e, value: v, color: i < 2 ? "--s2" : "--ord-2",
+            tip: tipRow(i < 2 ? "--s2" : "--ord-2", "持ち家", num(v) + "戸") +
+              (has(done) ? tipRow(null, "2019年以降に改修", num(done) + "戸（" +
+                fixed(done / v * 100) + "%）") : "") +
+              (has(insul) ? tipRow(null, "うち断熱工事", num(insul) + "戸") : "") };
+        }), { rowH: 28, leftPad: 116, axis: true,
+          fmtValue: function (v) { return num(v); },
+          fmtAxis: function (v) { return v >= 10000 ? num(v / 10000, 0) + "万" : num(v); },
+          aria: "建築時期別の持ち家数" })));
+
+      panel.appendChild(figure("建築時期別の改修率（2019年以降に工事をした割合）",
+        "古い家ほど手が入っていないなら、そこが提案の余地です", null,
+        rankedBars(eras.map(function (e, i) {
+          var v = sr.buildEra[e][idx];
+          var done = sr.buildEra[e][doneIdx];
+          var rate = v ? done / v * 100 : null;
+          return { label: e, value: rnd2(rate), color: i < 2 ? "--s2" : "--ord-2",
+            tip: tipRow(null, "持ち家", num(v) + "戸") +
+              tipRow(null, "改修した", num(done) + "戸") };
+        }), { rowH: 26, leftPad: 116, axis: true,
+          fmtValue: function (v) { return fixed(v) + "%"; },
+          fmtAxis: function (v) { return fixed(v, 0) + "%"; },
+          aria: "建築時期別の改修率" })));
+    } else if (a.level === "city") {
+      panel.appendChild(notice("<b>この市区町村は建築時期別の公表がありません。</b>" +
+        "住宅・土地統計調査の建築時期別は「市」と「区」のみが対象です。"));
+    }
+  }
+
+  function rnd2(v) { return has(v) ? Math.round(v * 100) / 100 : null; }
+
+  // ---------- 人の動き ----------
+  function flowName(code) {
+    return DATA.flowNames[code] || (BY_CODE[code] ? BY_CODE[code].name : code);
+  }
+
+  function tabFlow(panel) {
+    var a = currentArea();
+    var fl = (SERIES[a.code] || {}).flow;
+    panel.appendChild(headline((a.level === "national" ? "全国" : a.name) + "の人の動き",
+      "どこから入ってきて、どこへ出て行っているか。住民基本台帳の移動報告から、" +
+      "相手の市町村ごとに集計しています。"));
+
+    if (!fl) {
+      panel.appendChild(notice("<b>この地域は移動元・移動先の集計がありません。</b>" +
+        "全国を選んでいる場合は、国内の移動なので相手先がありません。" +
+        "都道府県か市区町村を選んでください。"));
+      return;
+    }
+
+    var latestIdx = META.flowYears.length - 1;
+    var year = META.flowYears[latestIdx];
+    var sr = SERIES[a.code] || {};
+    panel.appendChild(tiles([
+      { label: "転入者数（" + a.socialYear + "年）", value: num(a.inMig), unit: "人",
+        sub: a.level === "pref" ? "ほかの都道府県から入ってきた人"
+                                : "ほかの市区町村から入ってきた人" },
+      { label: "転出者数（" + a.socialYear + "年）", value: num(a.outMig), unit: "人",
+        sub: a.level === "pref" ? "ほかの都道府県へ出て行った人"
+                                : "ほかの市区町村へ出て行った人" },
+      { label: "転入超過", value: signed(a.social), unit: "人",
+        sub: "プラスなら人が増えている" },
+      { label: "転入超過／世帯1,000", value: fixed(a.socialPer1k, 2), unit: "人",
+        sub: "規模のちがう地域を比べるための値" }
+    ]));
+
+    if (sr.migIn && sr.migOut) {
+      panel.appendChild(figure("転入と転出の推移",
+        "社会・人口統計体系（住民基本台帳ベース）／" + META.flowYears[0] + "〜" +
+        META.flowYears[latestIdx] + "年",
+        [{ color: "--s1", label: "転入" }, { color: "--s2", label: "転出" }],
+        lineChart({
+          labels: META.flowYears.map(function (y) { return y + "年"; }),
+          xTicks: META.flowYears.map(function (y, i) { return { i: i, label: y }; }),
+          series: [{ label: "転入", color: "--s1", values: sr.migIn },
+                   { label: "転出", color: "--s2", values: sr.migOut }],
+          zero: true, unit: "人", dots: true, ratio: 0.34, maxH: 260,
+          aria: "転入と転出の推移"
+        })));
+    }
+
+    var cols = el("div", "cols");
+    if (fl.cityIn) {
+      cols.appendChild(figure("どこから来ているか（市町村別・上位10）",
+        year + "年。政令市は市全体でまとめています。県内からの移動も含みます。" +
+        "棒にカーソルを合わせると6年分の推移が出ます", null,
+        rankedBars(fl.cityIn.map(function (e) {
+          return { label: flowName(e[0]), value: e[latestIdx + 1],
+            color: e[0] === a.code ? "--ink-muted" : "--s1",
+            tip: META.flowYears.map(function (y, i) {
+              return tipRow(i === latestIdx ? "--s1" : null, y + "年", num(e[i + 1]) + "人");
+            }).join("") };
+        }), { rowH: 26, leftPad: 150,
+          fmtValue: function (v) { return num(v); }, aria: "転入元の上位" })));
+    }
+    if (fl.cityOut) {
+      cols.appendChild(figure("どこへ出て行っているか（市町村別・上位10）",
+        year + "年。転入元と同じ相手が並ぶときは、行き来が多い間柄です", null,
+        rankedBars(fl.cityOut.map(function (e) {
+          return { label: flowName(e[0]), value: e[1], color: "--s2",
+            tip: tipRow("--s2", "転出", num(e[1]) + "人") };
+        }), { rowH: 26, leftPad: 150,
+          fmtValue: function (v) { return num(v); }, aria: "転出先の上位" })));
+    }
+    panel.appendChild(cols);
+
+    // 相手ごとの差し引き
+    var net = {};
+    (fl.cityIn || []).forEach(function (e) {
+      net[e[0]] = { code: e[0], inv: e[latestIdx + 1] || 0, out: 0 };
+    });
+    (fl.cityOut || []).forEach(function (e) {
+      net[e[0]] = net[e[0]] || { code: e[0], inv: 0, out: 0 };
+      net[e[0]].out = e[1] || 0;
+    });
+    var netRows = Object.keys(net).map(function (k) { return net[k]; })
+      .filter(function (r) { return r.code !== a.code; })
+      .map(function (r) {
+        return { label: flowName(r.code), value: r.inv - r.out,
+          tip: tipRow("--s1", "転入", num(r.inv) + "人") +
+            tipRow("--s2", "転出", num(r.out) + "人") };
+      })
+      .sort(function (x, y) { return y.value - x.value; });
+    if (netRows.length) {
+      panel.appendChild(figure("相手ごとの差し引き（転入 − 転出）",
+        "プラスはその相手から人を取れている、マイナスは取られている、という意味です。" +
+        "上位10の相手だけを突き合わせているため、すべての相手は含みません", null,
+        rankedBars(netRows, { rowH: 24, leftPad: 150, axis: true,
+          fmtValue: function (v) { return signed(v); },
+          fmtAxis: function (v) { return signed(v); }, aria: "相手ごとの差し引き" })));
+    }
+
+    if (fl.prefIn) {
+      panel.appendChild(figure("どの都道府県から来ているか（上位10）",
+        year + "年。自分の県が上位に来る場合は、県内での移動が中心という意味です", null,
+        rankedBars(fl.prefIn.map(function (e) {
+          return { label: flowName(e[0]), value: e[latestIdx + 1],
+            color: e[0] === (a.prefCode + "000") ? "--ord-2" : "--s1",
+            tip: META.flowYears.map(function (y, i) {
+              return tipRow(i === latestIdx ? "--s1" : null, y + "年", num(e[i + 1]) + "人");
+            }).join("") };
+        }), { rowH: 24, leftPad: 110,
+          fmtValue: function (v) { return num(v); }, aria: "転入元の都道府県" })));
     }
   }
 
@@ -1255,7 +1532,62 @@
       ageChart(sr.age)));
     panel.appendChild(cols);
 
+    if (has(a.hhAlone)) {
+      panel.appendChild(headline("世帯のかたち",
+        "同じ世帯数でも、中身が単独世帯なのか子育て世帯なのかで、必要な間取りと価格帯が変わります。"));
+      panel.appendChild(tiles([
+        { label: "単独世帯", value: man(a.hhAlone), unit: "万世帯",
+          sub: has(a.aloneShare) ? "世帯の " + fixed(a.aloneShare) + "％" +
+            (a.level === "national" ? "" : "／全国は " + fixed(NATIONAL.aloneShare) + "％") : "" },
+        { label: "核家族世帯", value: man(a.hhNuclear), unit: "万世帯",
+          sub: has(a.hhNuclear) && a.hh2020 ?
+            "世帯の " + fixed(a.hhNuclear / a.hh2020 * 100) + "％" : "" },
+        { label: "高齢単身世帯", value: man(a.hhElderAlone), unit: "万世帯",
+          sub: has(a.elderAloneShare) ? "世帯の " + fixed(a.elderAloneShare) +
+            "％。住み替えや相続が動きやすい層です" : "" },
+        { label: "平均世帯人員", value: fixed(a.size2020, 2), unit: "人",
+          sub: a.level === "national" ? "1980年は3.22人"
+                                      : "全国は " + fixed(NATIONAL.size2020, 2) + "人" }
+      ]));
+    }
+
+    var ab = sr.ageBands;
+    if (ab) {
+      panel.appendChild(headline("年齢5歳階級別の人口",
+        "一次取得層（30〜40代）の厚みと、これから相続で家が動く層の規模を見ます。"));
+      var futYears = Object.keys(ab.fut || {}).sort();
+      if (futYears.length) {
+        panel.appendChild(figure("年齢階級別の人口（いまと2050年）",
+          "2020年は国勢調査、それ以降は社人研 令和5年推計。棒が短くなる帯がこれから細る世代です",
+          futYears.map(function (y, i) {
+            return { color: i === 0 ? "--s1" : "--s2", label: y + "年", shape: "sq" };
+          }),
+          ageProfile(futYears.map(function (y, i) {
+            return { label: y + "年", color: i === 0 ? "--s1" : (i === futYears.length - 1 ? "--s2" : "--ord-2"),
+              values: ab.fut[y] };
+          }), META.ageBandLabels)));
+      }
+      var histYears = Object.keys(ab.hist || {}).sort();
+      if (histYears.length >= 2) {
+        var pick = [histYears[0], histYears[histYears.length - 1]];
+        panel.appendChild(figure("年齢階級別の人口（" + pick[0] + "年と" + pick[1] + "年）",
+          "国勢調査ベース。40年でどの世代が入れ替わったかが分かります",
+          pick.map(function (y, i) {
+            return { color: i === 0 ? "--ord-2" : "--s1", label: y + "年", shape: "sq" };
+          }),
+          ageProfile(pick.map(function (y, i) {
+            return { label: y + "年", color: i === 0 ? "--ord-2" : "--s1", values: ab.hist[y] };
+          }), META.ageBandLabels)));
+      } else if (a.level === "city") {
+        panel.appendChild(notice("<b>市区町村には5歳刻みの実績統計がありません。</b>" +
+          "上の図は社人研の推計（2020年の実績を起点に2050年まで）です。" +
+          "過去の推移は都道府県を選ぶと5歳刻みで見られます。"));
+      }
+    }
+
     if (has(a.social)) {
+      panel.appendChild(headline("人の出入り",
+        "細かい相手先は「人の動き」タブで見られます。"));
       panel.appendChild(tiles([
         { label: "転入超過（" + a.socialYear + "年）", value: signed(a.social), unit: "人",
           sub: "転入から転出を引いた数。プラスは人が入っている" },
